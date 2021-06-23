@@ -1,0 +1,118 @@
+Method=GET
+http://localhost:80/api/allDropdowns
+{
+	"procedures": [{
+			"procedureName": "EGD",
+			"activities": [{
+					"activityName": "Diagnostic",
+					"code": 43235
+				},
+				{
+					"activityName": "Diagnostic with Biopsy",
+					"code": 43239
+				}
+				....
+			]
+		},
+		{
+			"procedureName": "Colon",
+			"activities": [{
+					"activityName": "Diagnostic",
+					"code": 45378
+				},
+				{
+					"activityName": "Diagnostic with Biopsy",
+					"code": 45380
+				}
+			]
+		},
+		....
+	]
+}
+
+object.procedures[0]=what
+
+{
+			"procedureName": "EGD",
+			"activities": [{
+					"activityName": "Diagnostic",
+					"code": 43235
+				},
+				{
+					"activityName": "Diagnostic with Biopsy",
+					"code": 43239
+				}
+				....
+			]
+		}
+		
+object.procedures[0].actvities[0]= what
+{
+					"activityName": "Diagnostic",
+					"code": 43235
+				},
+				
+object.procedures[0].procedureName= answer will be EGD
+object.procedures[0].actvities[0].activityName="Diagnostic"
+
+
+http://localhost:80/api/procedureDropdowns
+{
+	"procedures": [{
+			"procedureName": "EGD"
+		},
+		{
+			"procedureName": "Colon"
+		}
+
+	]
+}
+Method: GET
+http://localhost:80/api/activityDropdowns?procedureName="Colon"
+
+{
+	"activities": [{
+			"activityName": "Diagnostic",
+			"code": 45378
+		},
+		{
+			"activityName": "Diagnostic with Biopsy",
+			"code": 45380
+		}
+	]
+}
+
+
+
+
+Create Patient
+SAVE
+Method: Post
+http://localhost:80/api/Patient
+
+{
+    "firstName"="Blah"
+	"lastName"="Blah"
+	"vistId" = 123
+}
+
+Answer
+
+201 Created
+{
+   patientId="456"
+}
+
+
+SAVE
+Method: POST
+http://localhost:80/api/procedure
+
+{
+   "patientId":"456",
+   "vistId": "123"
+   "ProcedureName": "EGD"
+   "activityCode" : "45378"
+   "doctorName": "name of the doctor"
+   "time":"20210518:18:00"
+}

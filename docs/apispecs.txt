@@ -1,34 +1,4 @@
-Method=GET
-http://localhost:80/api/allDropdowns
-{
-	"procedures": [{
-			"procedureName": "EGD",
-			"activities": [{
-					"activityName": "Diagnostic",
-					"code": 43235
-				},
-				{
-					"activityName": "Diagnostic with Biopsy",
-					"code": 43239
-				}
-				....
-			]
-		},
-		{
-			"procedureName": "Colon",
-			"activities": [{
-					"activityName": "Diagnostic",
-					"code": 45378
-				},
-				{
-					"activityName": "Diagnostic with Biopsy",
-					"code": 45380
-				}
-			]
-		},
-		....
-	]
-}
+
 
 object.procedures[0]=what
 

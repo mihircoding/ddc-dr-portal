@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My Page!</title>
+        <link rel="stylesheet" href="form.css">
+    </head>
+    <body>
+        <header>FORM</header>
+        
+            <section>
+                    <ul>
+                        <li>
+                            <label for="name">Name:</label>
+                            <input type="text" id ="name" name="user">
+                        </li>
+                        <li>
+                            <label for="Sex">Sex:</label>
+                            <input type="radio" id ="male" name="sex" value="male">
+                            <label for="male">Male</label>
+
+                            <input type="radio" id="female" name="sex" value="female">
+                            <label for="female">Female</label>
+                        </li>
+                        <li>
+                            <label for="age">Age:</label>
+                            <input type="text" id ="age" name="age">
+                        </li>
+                        <li>
+                            <label for="uniqueid">Unique id:</label>
+                            <input type="text" id="uniqueid"name="uniqueid">
+                        </li>
+
+                        <div class="tab">
+                            <button class="tablinks" onclick="openProcedure(event, 'Procedures')">Procedures</button>
+                            <button class="tablinks" onclick="openProcedure (event, 'Consultations')">Consultations</button>
+                            
+                        </div>
+                          
+                          <!-- Tab content -->
+                        <div id="Procedures" class="tabcontent">
+                            <h3>Procedures</h3>
+                            <p>EGD procedures</p>
+                        </div>
+                          
+                        <div id="Consultations" class="tabcontent">
+                            <h3>Consultations</h3>
+                            <p>Flex Sig procedures</p>
+                        </div>
+
+                        <li class="button">
+                            <button type="submit">Send</button>
+                        </li>
+                    </ul>
+        </section>
+        <script src="form.js"></script>
+    </body>
+    
+</html>

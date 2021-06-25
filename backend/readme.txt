@@ -1,1 +1,1 @@
-This is the javascript api
+This is a random text.

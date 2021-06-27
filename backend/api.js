@@ -15,13 +15,14 @@ app.get('/api/procedureDropdowns', (request, response) => {
     response.send(procedureDict);
 });
 
-app.get('/api/selectDropdown', (request, response) => {
+app.get('/api/activities', (request, response) => {
     let activitiesDict = { "activities": [] };
     //console.log(`The request value is ${request.query.procedureName}`);
     jsonData['procedures'].forEach(element => {
         if (element.procedureName === request.query.procedureName) {
-            activitiesDict.activities.push(element.activities);
-            //console.log(`This is the procedure: ${element.procedureName} and the activities  ${element.activities}`);
+            element.activities.forEach(activity => {
+                activitiesDict.activities.push(activity)
+            })
         }
     });
     response.send(activitiesDict);

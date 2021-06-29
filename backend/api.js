@@ -1,9 +1,17 @@
 const fs = require('fs');
+const mysql = require('mysql');
 const express = require('express');
 const app = express();
 
-let contents = fs.readFileSync('data/masterdata.json');
+let contents = fs.readFileSync('../data/masterdata.json');
 const jsonData = JSON.parse(contents); //Contains the accessible json file
+let connection = mysql.createConnection({
+    host: "localhost",
+    user: "projectuser",
+    pass: "portalservice",
+    database: "patientdb"
+});
+
 
 //GET Procedures
 app.get('/api/procedureDropdowns', (request, response) => {

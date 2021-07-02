@@ -1,58 +1,181 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>My Page!</title>
-        <link rel="stylesheet" href="form.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src=
+	"https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js">
+	</script>
     </head>
+
     <body>
-        <header>FORM</header>
+		<div id='info'></div>
+        <div class="container pt-4">
+            <div class="table-responsive">
+            <table id="procedureTable" class="table table-bordered">
+                <thead>
+                <tr id="R0">
+                    <th class="text-center">procedure name </th>
+                    <th class="text-center">diagnostic type</th>
+					<th class="text-center">date</th>
+					<th class="text-center">
+					<button class="btn btn-md btn-primary" id="addBtn" type="button" onclick="procedureRowAdd()">Add</button>
+					</th>
+                </tr>
+                </thead>
+                <tbody id="placeholder">
+
+                </tbody>
+            </table>
+            </div>
+        </div>
+
         
-            <section>
-                    <ul>
-                        <li>
-                            <label for="name">Name:</label>
-                            <input type="text" id ="name" name="user">
-                        </li>
-                        <li>
-                            <label for="Sex">Sex:</label>
-                            <input type="radio" id ="male" name="sex" value="male">
-                            <label for="male">Male</label>
-
-                            <input type="radio" id="female" name="sex" value="female">
-                            <label for="female">Female</label>
-                        </li>
-                        <li>
-                            <label for="age">Age:</label>
-                            <input type="text" id ="age" name="age">
-                        </li>
-                        <li>
-                            <label for="uniqueid">Unique id:</label>
-                            <input type="text" id="uniqueid"name="uniqueid">
-                        </li>
-
-                        <div class="tab">
-                            <button class="tablinks" onclick="openProcedure(event, 'Procedures')">Procedures</button>
-                            <button class="tablinks" onclick="openProcedure (event, 'Consultations')">Consultations</button>
-                            
-                        </div>
-                          
-                          <!-- Tab content -->
-                        <div id="Procedures" class="tabcontent">
-                            <h3>Procedures</h3>
-                            <p>EGD procedures</p>
-                        </div>
-                          
-                        <div id="Consultations" class="tabcontent">
-                            <h3>Consultations</h3>
-                            <p>Flex Sig procedures</p>
-                        </div>
-
-                        <li class="button">
-                            <button type="submit">Send</button>
-                        </li>
-                    </ul>
-        </section>
-        <script src="form.js"></script>
     </body>
-    
+
+    <script>
+    	$(document).ready(function () {
+			console.log("Ready is called");
+		   procedureRowAdd();
+		   
+		});
+		
+    	function procedureRowAdd() {
+			console.log("procedureRowAdd is called");
+			var rowId=$("#procedureTable tr").length;
+			var saveBtn = addSaveButton(rowId);
+			var delBtn = addDeleteButton(rowId);
+			var trCode=`<tr id='R${rowId}'>
+						<td id='R${rowId}1'></td> 
+						<td id='R${rowId}2'></td> 
+						<td id='R${rowId}3'>${dateStr()}</td> 
+						<td id='R${rowId}4'>${saveBtn}</td> 
+						<td id='R${rowId}5'>${delBtn}</td> 
+						</tr>`;
+			
+			
+			if(rowId === 1) {
+				$("#placeholder").append(trCode);
+			}
+			else {
+				$("#placeholder").prepend(trCode);
+			}
+			
+			addDropDownOne(rowId);
+			addDropDownTwo('EGD', 'dropone'+rowId);
+		}
+		
+	
+		function dateStr() {
+			console.log("datestr is called");
+			var dateStr = `<input type = 'date' id = 'datepicker' name = 'datepicker'> `;
+			return dateStr;
+		}
+
+		function addSaveButton(rowId)  {
+			console.log("addSaveButton is called");
+			var button = `<button class="btn btn-md btn-primary" id="saveBtn${rowId}" type="button" onclick="editData(${rowId})">&#x1f4be</button>`;
+      	  return button;
+		  }
+		
+		function editData(rowId) {
+			var currentText = $('#droptwo1 option:selected').text();
+			var procedureText = $('#dropone1 option:selected').text();
+			$('#droptwo1').remove();
+			$('#dropone1').remove();
+			$(`#R${rowId}2`).html(currentText);
+			$(`#R${rowId}1`).html(procedureText);
+			$(`#saveBtn${rowId}`).html('&#x270D');
+			$(`#saveBtn${rowId}`).attr("onclick",`saveData(${rowId})`);
+		}
+		function saveData(rowId){
+			$(`#R${rowId}2`).empty();
+			$(`#R${rowId}1`).empty();
+		
+			addDropDownOne(rowId);
+			addDropDownTwo('EGD', 'dropone'+rowId);
+			$(`#saveBtn${rowId}`).html('&#x1f4be');
+			$(`#saveBtn${rowId}`).attr("onclick",`editData(${rowId})`);
+		}
+		function addDeleteButton(rowId){
+			var button = `<button class="btn btn-md btn-primary" id="delBtn${rowId}" type="button" onclick="delData(${rowId})">&#x1f5d1</button>`;
+			return button;
+		}
+		function delData(rowId){
+			$(`#R${rowId}`).remove();
+			/*$(`#delBtn${rowId}5`).remove();
+			$(`#saveBtn${rowId}4`).remove();
+			$('#datepicker').remove();
+			$('#droptwo1').remove();
+			$('#dropone1').remove();*/
+		}
+		function addDropDownOne(rowId) {
+			console.log("addDropDownOne is called");
+			callAjax('http://localhost:3000/api/procedureDropdowns', 'GET').
+			done(function(data, textStatus, jqXHR) {
+				var select= `<select name="dropdown1" id="dropone${rowId}" onchange="getDropDown2(this)">`;
+				procs=data.procedures;
+				var optionString="";
+				console.log("getting her");
+				if(procs) {
+					procs.forEach(element => {
+						optionString = optionString + "<option value='"+element.procedureName+"'>"+element.procedureName+"</option>";
+					});
+					
+				}
+				select = select + optionString+"</select>";
+				var key="#R"+rowId+"1";
+				$(key).append(select);	
+			});
+		}
+
+		function addDropDownTwo(selectedItem, selectedId) {
+			console.log("addDropDownTwo is called");
+			var uri='http://localhost:3000/api/activities?procedureName='+selectedItem;
+			var rowId= selectedId.replace("dropone", "");
+			var secondId = selectedId.replace("one", "two");
+			
+			callAjax(uri, 'GET').
+			done(function(data, textStatus, jqXHR) {
+				acts=data.activities;
+				var select= `<select name="dropdown2" id="${secondId}" >`;
+				var optionString="";
+				
+				if(acts) {
+					acts.forEach(element => {
+						optionString = optionString + "<option value='"+element.code+"'>"+element.activityName+"</option>";
+					});
+					
+				}
+				select = select + optionString+"</select>";
+				var key="#R"+rowId+"2";
+				$(key).empty();
+				$(key).append(select);	
+			});
+		}
+			
+	  function getDropDown2(selected) {
+			console.log("getDropDown2 is called");
+			  addDropDownTwo(selected.value,selected.id);
+	  }
+
+		function callAjax(uri, method) {
+			return $.ajax({
+			  url: uri,
+			  crossDomain:true,
+			// dataType: 'jsonp',
+			accepts:'application/json',
+			  type: 'GET'
+			})
+			  .fail(function(jqXHR, textStatus, errorThrown) {
+				$('#info').html('<p>An error has occurred</p>');
+				alert('I am in ajax error');
+			  })
+			  .always(function(data, textStatus, jqXHR) {
+				  
+				 // do any cleanup
+			  });
+		}
+
+    </script>
 </html>

@@ -45,10 +45,11 @@
 			var rowId=$("#procedureTable tr").length;
 			var saveBtn = addSaveButton(rowId);
 			var delBtn = addDeleteButton(rowId);
+			var dateBtn = addDatePicker(rowId);
 			var trCode=`<tr id='R${rowId}'>
 						<td id='R${rowId}1'></td> 
 						<td id='R${rowId}2'></td> 
-						<td id='R${rowId}3'>${dateStr()}</td> 
+						<td id='R${rowId}3'>${dateBtn}</td> 
 						<td id='R${rowId}4'>${saveBtn}</td> 
 						<td id='R${rowId}5'>${delBtn}</td> 
 						</tr>`;
@@ -56,6 +57,7 @@
 			
 			if(rowId === 1) {
 				$("#placeholder").append(trCode);
+
 			}
 			else {
 				$("#placeholder").prepend(trCode);
@@ -63,15 +65,18 @@
 			
 			addDropDownOne(rowId);
 			addDropDownTwo('EGD', 'dropone'+rowId);
+			dateStr(rowId);
 		}
 		
-	
-		function dateStr() {
-			console.log("datestr is called");
-			var dateStr = `<input type = 'date' id = 'datepicker' name = 'datepicker'> `;
-			return dateStr;
+		function addDatePicker(rowId){
+			var button = `<input type = 'date' id = 'datepicker${rowId}' name = 'datepicker'>`
+			return button;
 		}
-
+		function dateStr(rowId) {
+			console.log("datestr is called");
+			var today = new Date();
+    		$(`#datepicker${rowId}`).val(today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + today.getDate()).slice(-2));
+		}
 		function addSaveButton(rowId)  {
 			console.log("addSaveButton is called");
 			var button = `<button class="btn btn-md btn-primary" id="saveBtn${rowId}" type="button" onclick="editData(${rowId})">&#x1f4be</button>`;
@@ -79,21 +84,26 @@
 		  }
 		
 		function editData(rowId) {
-			var currentText = $('#droptwo1 option:selected').text();
-			var procedureText = $('#dropone1 option:selected').text();
-			$('#droptwo1').remove();
-			$('#dropone1').remove();
+			var currentText = $(`#droptwo${rowId} option:selected`).text();
+			var procedureText = $(`#dropone${rowId} option:selected`).text();
+			var dateText = $(`#datepicker${rowId}`).val();
+			
+			$(`#droptwo${rowId}`).remove();
+			$(`#dropone${rowId}`).remove();
+			$(`#datepicker${rowId}`).remove();
 			$(`#R${rowId}2`).html(currentText);
 			$(`#R${rowId}1`).html(procedureText);
+			$(`#R${rowId}3`).html(dateText);
 			$(`#saveBtn${rowId}`).html('&#x270D');
 			$(`#saveBtn${rowId}`).attr("onclick",`saveData(${rowId})`);
 		}
 		function saveData(rowId){
 			$(`#R${rowId}2`).empty();
 			$(`#R${rowId}1`).empty();
-		
+			$(`#R${rowId}3`).empty();
 			addDropDownOne(rowId);
 			addDropDownTwo('EGD', 'dropone'+rowId);
+			$(`#R${rowId}3`).html(`<input type = 'date' id = 'datepicker${rowId}' name = 'datepicker'>`);
 			$(`#saveBtn${rowId}`).html('&#x1f4be');
 			$(`#saveBtn${rowId}`).attr("onclick",`editData(${rowId})`);
 		}

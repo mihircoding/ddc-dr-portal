@@ -14,6 +14,42 @@
             <div class="table-responsive">
             <table id="procedureTable" class="table table-bordered">
                 <thead>
+
+                </thead>
+				<tbody>
+					<td id="FirstNameTag" class="text-left"><b>First Name: </b><input id ="FirstName" type="text"></td>
+					
+					<td id="LastNameTag" class="text-left"><b>Last Name: </b><input id="LastName" type="text"></td>
+				</tbody>
+            </table>
+            </div>
+        </div>
+		<div id='info'></div>
+        <div class="container pt-4">
+            <div class="table-responsive">
+            <table id="procedureTable" class="table table-bordered">
+                <thead>
+
+                </thead>
+				<tbody>
+					<td id="VisitIDTag" class="text-left"><b>Visit ID: </b><input id="VisitID" type="number" placeholder="Only numbers"></td>
+					
+					<td id="PatientIDTag" class="text-left"><b>Patient ID: </b><input id="PatientID" type="number" placeholder="Only numbers"></td>
+				</tbody>
+            </table>
+            </div>
+        </div>
+		<div style="text-align: center;">
+			<button class="btn btn-md btn-primary" id="saveBtnP" type="button" onclick="SaveDataPatient()">Save</button>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<button class="btn btn-md btn-primary" id="searchBtnP" type="button">Search</button>
+		</div>
+
+		<div id='info'></div>
+        <div class="container pt-4">
+            <div class="table-responsive">
+            <table id="procedureTable" class="table table-bordered">
+                <thead>
                 <tr id="R0">
                     <th class="text-center">procedure name </th>
                     <th class="text-center">diagnostic type</th>
@@ -29,6 +65,10 @@
             </table>
             </div>
         </div>
+
+		<div>
+			
+		</div>
 
         
     </body>
@@ -169,6 +209,44 @@
 			  addDropDownTwo(selected.value,selected.id);
 	  }
 
+
+	  	function SaveDataPatient(){
+			var holdervar1 = $(`#VisitID`).val();
+			var holdervar2 = $(`#PatientID`).val();
+			var holdervar3 = $(`#FirstName`).val();
+			var holdervar4 = $(`#LastName`).val();
+			$(`#VisitID`).remove();
+			$(`#PatientID`).remove();
+			$(`#FirstName`).remove();
+			$(`#LastName`).remove();
+			$(`#VisitIDTag`).html('<b>Visit ID: </b>' + holdervar1);
+			$(`#PatientIDTag`).html('<b>Patient ID: </b>' + holdervar2);
+			$(`#FirstNameTag`).html('<b>First Name: </b>' + holdervar3);
+			$(`#LastNameTag`).html('<b>Last Name: </b>' + holdervar4);
+			$(`#saveBtnP`).html("Edit")
+			$(`#saveBtnP`).attr('onclick','EditDataPatient()');
+		  }
+		function EditDataPatient(){
+			var holdervar1 = $(`#VisitIDTag`).text();
+			var holdervar2 = $(`#PatientIDTag`).text();
+			var holdervar3 = $(`#FirstNameTag`).text();
+			var holdervar4 = $(`#LastNameTag`).text();
+			holdervar1 = holdervar1.substr(9);
+			holdervar2 = holdervar2.substr(11);
+			holdervar3 = holdervar3.substr(11);
+			holdervar4 = holdervar4.substr(10);
+			var inputTextVisit = `<input value=${holdervar1} id = 'VisitID' type = 'number' placeholder='Only numbers'>`;
+			var inputTextPatient = `<input value=${holdervar2} id = 'PatientID' type = 'number' placeholder='Only numbers'>`;
+			var inputTextFirstName = `<input value=${holdervar3} id = 'FirstName' type = 'text'>`;
+			var inputTextLastName = `<input value=${holdervar4} id = 'LastName' type = 'text'>`;
+
+			$(`#VisitIDTag`).html('<b>Visit ID: </b>' + inputTextVisit);
+			$(`#PatientIDTag`).html('<b>Patient ID: </b>' +inputTextPatient);
+			$(`#FirstNameTag`).html('<b>First Name: </b>' +inputTextFirstName);
+			$(`#LastNameTag`).html('<b>Last Name: </b>' +inputTextLastName);
+			$(`#saveBtnP`).html('Save');
+			$(`#saveBtnP`).attr('onclick','SaveDataPatient()');
+		}
 		function callAjax(uri, method) {
 			return $.ajax({
 			  url: uri,

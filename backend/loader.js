@@ -8,26 +8,15 @@ const mysql = require('mysql');
 const fs = require('fs');
 const properties = require('./properties.js');
 
-let connection = mysql.createConnection({
-    host: "localhost",
-	port: 3306,
-    user: "projectuser",
-    password: "portalservice",
-	database: "patientdb" //Created from SQL Shell (Can add "CREATE DATABASE IF NOT EXISTS patientdb;")
-});
+properties.createDatabase;
+let connection = properties.connectionDb;
 
 //Connecting to the database || Create an array that will end up in the table
 connection.connect(function (err) {
     if (err) throw err;
     console.log("Connection Succeeded!");
 
-	let createActivities = `CREATE TABLE IF NOT EXISTS activities(
-		activityid INT PRIMARY KEY NOT NULL,
-		type VARCHAR(45) NOT NULL,
-		category VARCHAR(45) NOT NULL,
-		name VARCHAR(45) NOT NULL,
-		code INT NOT NULL
-	)`;
+	let createActivities = properties.createActivities;
 	
 	connection.query(createActivities, function (err, result) {
 		if (err) {
@@ -37,7 +26,7 @@ connection.connect(function (err) {
 
 
     //inserting activities table
-    let template = "INSERT IGNORE INTO activities (activityid, type, category, name, code) VALUES ?";
+    let template = properties.activitiesTemplate; 
     let data = activitiesRows();
 	//console.log(data);
     connection.query(template, [data], function (err, result) {

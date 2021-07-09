@@ -1,116 +1,135 @@
-const fs = require('fs');
 const mysql = require('mysql');
 const express = require('express');
 const cors = require('cors');
+const properties = require('./properties.js');
 
 const app = express();
 app.use(cors());
 
-let contents = fs.readFileSync('../data/masterdata.json');
-const jsonData = JSON.parse(contents); //Contains the accessible json file
-let connection = mysql.createConnection({
-    host: "localhost",
-	port: 3306,
-    user: "projectuser",
-    password: "portalservice",
-    database: "patientdb"
-});
-
+let connection = properties.connectionDb;
 
 //GET Procedures
 app.get('/api/procedureDropdowns', (request, response) => {
-    let procedureDict = { "procedures": [] };
-	let contents = [];
-	let strippedContents = [];
+	
+	console.log("request received");
+	
+	let query = properties.procedureDropdown;
+
 
 	connection.connect(function (err) {
-		if (err) throw err;
-		
-		//Write the function in here (SELECT type, category) {procedureName : ""} 
-		//There are duplicate procedureNames
+		if (err) {
+			console.log(err.message);
+		}
 
-		let query = "SELECT JSON_ARRAYAGG(JSON_OBJECT('procedureName', category)) FROM activities WHERE type='Procedure'";
-		connection.query(query, function(err, result) {
-			if (err) throw err;
-
-			contents = result;
-			console.log(contents);
-			strippedContents = JSON.parse(JSON.stringify(contents))[0];
-			strippedContents = JSON.parse(Object.values(strippedContents)[0]);
-			//console.log(strippedContents);
-			procedureDict.procedures = removeDuplicates(strippedContents);
-			response.send(procedureDict);
-		});
+		connection.query(query, function (err, result) {
+			if (err) {
+				console.log(err.message);
+			}
+			response.send(result);
+		});	
 	});
 	
 });
 
 
 app.get('/api/activities', (request, response) => {
-    let activitiesDict = { "activities": [] };
-	let contents = [];
-	let strippedContents = [];
     let category = request.query.procedureName;
-
-	let query = "SELECT JSON_ARRAYAGG(JSON_OBJECT('procedureName', category, 'activityName', name, 'code', code)) FROM activities";
 	
+	let query = properties.activitiesDropdown(category);
+
 	connection.query(query, function (err, result) {
-		if (err) throw err;
-
-		contents = result;
-		strippedContents = JSON.parse(JSON.stringify(contents))[0];
-		strippedContents = JSON.parse(Object.values(strippedContents)[0]);
-
-		let filtered = filter(strippedContents, category);
-		activitiesDict.activities = filtered;
-		response.send(activitiesDict);
-		
-
-		connection.end();
-		
+		if (err) {
+			console.log(err.message);
+		}
+		if (result.length == 0) {
+			response.sendStatus(404);
+		}
+		else {
+			response.send(result);
+		}
 	});
-	
-
-    //response.send(activitiesDict);
 });
 
+app.get('/api/doctorActivities', (request, response) => {
+	let visitid = request.query.visitid;
+	let activityid = 0;
+	let query = `SELECT activityid FROM doctoractivity WHERE visitid=${visitid}`;
+	connection.query(query, function(err, result) {
+		response.send(result);
+	});
+});
 
 //POST Procedures
-app.post('/api/Patient', (request, response) => {
-    let firstName = request.query.firstName;
-    let lastName = request.query.lastName;
-    let visitId = request.query.visitId;
+app.post('/api/savePatient', (request, response) => {
+	let patientid = request.query.patientid;
+	let firstName = request.query.firstName;
+	let lastName = request.query.lastName;
+	let middlename = request.query.middleName;
+	let gender = request.query.gender;
+	//add visit
+	if (properties.patientCount(firstName, lastName) == 0) {
+		let query = properties.addPatient(patientid, firstName, lastName, middlename, gender);
+
+		connection.query(query, function (err) {
+			if (err) {
+				console.log(err.message);
+			}
+
+		});
+		response.send("The patient has been added");
+	}
+	else {
+		response.send("This patient already exists");
+	}
+	
 });
 
+app.post('/doctorActivities', (request, response) => {
+	//activityid or code
+	//doctorid or doctorname
+	//visitid
+	//proceduretime
+	//[did*, doctorid, visitid*, activityid, proceduretime*]
+	let procedureTime = request.query.procedureTime;
+	let visitid = request.query.visitid;
+	let activityid = request.query.activityid;
+	let doctorid = request.query.doctorid;
+	let code = request.query.code;
+	
+	if (activityid == null) {
+		let query = `SELECT activityid FROM activities WHERE code-=${code}`;
+		connection.query(query, function(err, result) {
+			if (err) {
+				console.log(err.message);
+			}
+			activityid = result; //Not actually the activityid, just an object
+		});
+
+		if (doctorid == null) {
+			let firstname = request.query.firstname;
+			let lastname = request.query.lastname;
+			let findID = `SELECT doctorid FROM doctor WHERE firstname='${firstname}' AND lastname='${lastname}'`;
+			
+			connection.query(findID, function (err, result) {
+				if (err) {
+					console.log(err.message);
+				}
+				doctorid = result;
+			});
+		}
+
+		connection.query(properties.addDoctorActivity(1, doctorid, visitid, activityid, procedureTime), function (err) { //Fix the did parameter
+			if (err) {
+				console.log(err.message);
+			}
+		});
+	}
+});
+
+//App Runner
 app.listen(3000, () => {
     console.log(`Example app listening at http://localhost:${3000}`)
 });
 
-//Helper Function
-function removeDuplicates(arr) {
-	let shortened = [];
 
-	arr.forEach(function (element) {
-		let unique = true;
-
-		shortened.forEach(function (element2) {
-			if (element2.procedureName == element.procedureName) unique = false;
-		});
-		if (unique) shortened.push(element);
-	});
-
-	return shortened;
-}
-
-function filter(arr, name) {
-	let stripped = [];
-
-	arr.forEach(function (element) {
-		if (element.procedureName === name) {
-			stripped.push({"activityName": element.activityName, "code": element.code});
-		}
-	});
-
-	return stripped;
-}
 

@@ -1,6 +1,7 @@
 //CREATE A FUNCTION THAT INITALIZES THE ENTIRE DATABASE
 const mysql = require('mysql');
 const fs = require('fs');
+const { response } = require('express');
 let queryList = [];
 
 
@@ -93,6 +94,16 @@ let addDoctorActivity = (did, doctorid, visitid, activityid, proceduretime) => {
 	return `INSERT INTO doctoractivity (did, doctorid, visitid, activityid, proceduretime) VALUES (${did}, ${doctorid}, ${visitid}, ${activityid}, ${proceduretime})`;
 }
 
+let addVisit = (visitid, admittime, dischargetime, inpatient = true, patientid) => {
+	try {
+		return `INSERT INTO visit (visitid, admittime, dischargetime, inpatient, patientid) VALUES (${visitid}, ${admittime}, ${dischargetime}, ${inpatient}, ${patientid})`;
+	}
+	catch (e) {
+		console.log(e);
+		//should be able to state that there are some null values
+	}
+}
+
 //Dropdowns
 let procedureDropdown = "SELECT DISTINCT category FROM activities WHERE type='Procedure'";
 
@@ -102,7 +113,43 @@ let activitiesDropdown = (categoryName) => {
 
 //Count Rows
 let patientCount = (firstName, lastName) => {
-	return `SELECT COUNT(*) FROM activities WHERE firstname='${firstName}' AND lastname='${lastName}'`;
+	let query = `SELECT COUNT(*) FROM patient WHERE firstname='${firstName}' AND lastname='${lastName}'`;
+	connectionDb.query(query, function(err, result) {
+		if (err) {
+			console.log(err.message);
+		}
+		return result;
+	});
+}
+
+let patientIdCount = (patientid) => {
+	if (patientid == null) {
+		return 0;
+	}
+	else {
+		let query = `SELECT COUNT(*) FROM patient WHERE patientid=${patientid}'`;
+		connectionDb.query(query, function(err, result) {
+			if (err) {
+				console.log(err.message);
+			}
+			return result;
+		});
+	}
+}
+
+let visitCount = (visitid) => {
+	if (visitid == null) {
+		return 0;
+	}
+	else {
+		let query = `SELECT COUNT(*) FROM doctoractivity WHERE visitid=${visitid}`;
+		connectionDb.query(query, function(err, result) {
+			if (err) {
+				console.log(err.message);
+			}
+			return result;
+		});
+	}
 }
 
 //Other
@@ -147,5 +194,13 @@ module.exports = {
 
 	addPatient: addPatient,
 	
-	addDoctorActivity: addDoctorActivity
+	addDoctorActivity: addDoctorActivity,
+
+	patientCount: patientCount,
+
+	visitCount: visitCount,
+
+	patientIdCount: patientIdCount,
+
+	addVisit: addVisit
 };

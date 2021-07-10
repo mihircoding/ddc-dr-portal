@@ -36,7 +36,7 @@ app.get('/api/activities', (request, response) => {
     let category = request.query.procedureName;
 	
 	let query = properties.activitiesDropdown(category);
-
+	let jsonAct = {"activities": []};
 	connection.query(query, function (err, result) {
 		if (err) {
 			console.log(err.message);
@@ -45,46 +45,75 @@ app.get('/api/activities', (request, response) => {
 			response.sendStatus(404);
 		}
 		else {
-			response.send(result);
+			jsonAct.activities = result;
+			response.send(jsonAct);
 		}
 	});
 });
 
 app.get('/api/doctorActivities', (request, response) => {
-	let visitid = request.query.visitid;
+	let visitid = request.query.visitid; //Should be an array
 	let activityid = 0;
+	//[category, activityname, activitycode]
 	let query = `SELECT activityid FROM doctoractivity WHERE visitid=${visitid}`;
 	connection.query(query, function(err, result) {
 		response.send(result);
 	});
 });
+//response -> [patientid, firstname, lastname, arr(visitid)] <- GET call to patients ? args can be any of the parameters
+app.get('/api/patients', (request, response) => {
+	//Precedence -> visitid, patientid, name
+	let patientid = request.query.patientid;
+	response.send(properties.patientIdCount(patientid));
+});
 
 //POST Procedures
-app.post('/api/savePatient', (request, response) => {
+app.post('/api/patients', (request, response) => {//visit,patient,first, last, gender, middlename
 	let patientid = request.query.patientid;
 	let firstName = request.query.firstName;
 	let lastName = request.query.lastName;
 	let middlename = request.query.middleName;
 	let gender = request.query.gender;
-	//add visit
-	if (properties.patientCount(firstName, lastName) == 0) {
-		let query = properties.addPatient(patientid, firstName, lastName, middlename, gender);
+	let visitid = request.query.visitid;
 
-		connection.query(query, function (err) {
-			if (err) {
-				console.log(err.message);
-			}
+	//if visit exists but patient does not, error
+	//if both exists, do nothing
+	//if patient exists but not visit, add visit
+	//if both dont exist, add both
 
-		});
-		response.send("The patient has been added");
+	if (properties.visitCount(visitid) != 0) {
+		if (properties.patientIdCount(patientid) == 0) {
+			response.sendStatus(404);
+		}
+		else {
+			response.send("This patient already exists");
+		}
 	}
-	else {
-		response.send("This patient already exists");
+	else if (properties.visitCount(visitid) == 0) {
+		if (properties.patientIdCount(patientid) == 0) {
+			connection.query(properties.addPatient(), function (err) {
+				if (err) {
+					console.log(err.message);
+				}
+			});
+			connection.query(properties.addVisit(), function (err) {
+				if (err) {
+					console.log(err.message);
+				}
+			});
+		}
+		else {
+			connection.query(properties.addVisit(), function (err) {
+				if (err) {
+					console.log(err.message);
+				}
+			});
+		}
 	}
 	
 });
 
-app.post('/doctorActivities', (request, response) => {
+app.post('/api/doctorActivities', (request, response) => {
 	//activityid or code
 	//doctorid or doctorname
 	//visitid

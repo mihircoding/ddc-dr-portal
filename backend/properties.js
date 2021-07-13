@@ -81,7 +81,7 @@ let activitiesTemplate = "INSERT IGNORE INTO activities (activityid, type, categ
 
 let patientTemplate = "INSERT INTO patient (patientid, firstname, lastname, middlename, gender) VALUES ?";
 
-let addPatient = (patientid, firstname, lastname, middlename = null, gender) => {
+let addPatient = (patientid, firstname, lastname, gender, middlename = null,) => {
 	if (middlename == null) {
 		return `INSERT INTO patient (patientid, firstname, lastname, gender) VALUES (${patientid}, ${firstname}, ${lastname}, ${gender})`;
 	}
@@ -94,13 +94,12 @@ let addDoctorActivity = (did, doctorid, visitid, activityid, proceduretime) => {
 	return `INSERT INTO doctoractivity (did, doctorid, visitid, activityid, proceduretime) VALUES (${did}, ${doctorid}, ${visitid}, ${activityid}, ${proceduretime})`;
 }
 
-let addVisit = (visitid, admittime, dischargetime, inpatient = true, patientid) => {
-	try {
+let addVisit = (visitid, admittime, dischargetime, patientid, inpatient = true) => {
+	try { 
 		return `INSERT INTO visit (visitid, admittime, dischargetime, inpatient, patientid) VALUES (${visitid}, ${admittime}, ${dischargetime}, ${inpatient}, ${patientid})`;
 	}
 	catch (e) {
 		console.log(e);
-		//should be able to state that there are some null values
 	}
 }
 
@@ -114,42 +113,38 @@ let activitiesDropdown = (categoryName) => {
 //Count Rows
 let patientCount = (firstName, lastName) => {
 	let query = `SELECT COUNT(*) FROM patient WHERE firstname='${firstName}' AND lastname='${lastName}'`;
-	connectionDb.query(query, function(err, result) {
-		if (err) {
-			console.log(err.message);
-		}
-		return result;
-	});
+	return query;
+	//connectionDb.query(query, function(err, result) {
+	//	if (err) {
+	//		console.log(err.message);
+	//	}
+	//	return result;
+	//});
 }
 
 let patientIdCount = (patientid) => {
-	if (patientid == null) {
-		return 0;
-	}
-	else {
-		let query = `SELECT COUNT(*) FROM patient WHERE patientid=${patientid}'`;
-		connectionDb.query(query, function(err, result) {
-			if (err) {
-				console.log(err.message);
-			}
-			return result;
-		});
-	}
+	let count = 0;
+	let query = "SELECT COUNT(*) FROM patient WHERE patientid=" + patientid;
+	//connectionDb.query(query, function(err, result) {
+	//	if (err) {
+	//		console.log(err.message);
+	//	}
+	//	count = result['COUNT(*)']
+	//});
+	return query;
 }
 
 let visitCount = (visitid) => {
-	if (visitid == null) {
-		return 0;
-	}
-	else {
-		let query = `SELECT COUNT(*) FROM doctoractivity WHERE visitid=${visitid}`;
-		connectionDb.query(query, function(err, result) {
-			if (err) {
-				console.log(err.message);
-			}
-			return result;
-		});
-	}
+	let query = "SELECT COUNT(*) FROM doctoractivity WHERE visitid=" + visitid;
+	let count = 0;
+	//connectionDb.query(query, function(err, result) {
+	//	if (err) {
+	//		console.log(err.message);
+	//	}
+	//	count = result["COUNT(*)"];
+	//});
+
+	return query;
 }
 
 //Other

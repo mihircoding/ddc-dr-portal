@@ -7,6 +7,7 @@ const app = express();
 app.use(cors());
 
 let connection = properties.connectionDb;
+//Cannot send a number in a response.
 
 //GET Procedures
 app.get('/api/procedureDropdowns', (request, response) => {
@@ -64,7 +65,21 @@ app.get('/api/doctorActivities', (request, response) => {
 app.get('/api/patients', (request, response) => {
 	//Precedence -> visitid, patientid, name
 	let patientid = request.query.patientid;
-	response.send(properties.patientIdCount(patientid));
+	//connection.query("SELECT COUNT(*) FROM patient WHERE patientid=5", function (err, result) {
+	//	if (err) {
+	//		console.log(err.message);
+	//	}
+	//	let thing = result[0];
+	//	response.send(String(thing["COUNT(*)"])); //Cannot access the value inside the json
+	//});
+	connection.query(properties.patientIdCount(patientid), function (err, result) {
+		if (err) {
+			console.log(err.message);
+		}
+		//let num = Object.values(result[0]);
+		response.send(result[0]["COUNT(*)"].toString());
+
+	})
 });
 
 //POST Procedures
@@ -72,45 +87,58 @@ app.post('/api/patients', (request, response) => {//visit,patient,first, last, g
 	let patientid = request.query.patientid;
 	let firstName = request.query.firstName;
 	let lastName = request.query.lastName;
-	let middlename = request.query.middleName;
+	let middleName = request.query.middleName;
 	let gender = request.query.gender;
 	let visitid = request.query.visitid;
+	let admittime = request.query.admittime;
+	let dischargetime = request.query.dischargetime;
+	let numPatient = 0;
+	let numVisit = 0;
 
-	//if visit exists but patient does not, error
-	//if both exists, do nothing
-	//if patient exists but not visit, add visit
-	//if both dont exist, add both
 
-	if (properties.visitCount(visitid) != 0) {
-		if (properties.patientIdCount(patientid) == 0) {
+	connection.query(properties.visitCount(visitid), function (err, result) {
+		if (err) {
+			console.log(err.message);
+		}
+		numVisit = result[0]["COUNT(*)"]; 
+
+	connection.query(properties.patientIdCount(patientid), function (err, result) {
+		if (err) {
+			console.log(err.message);
+		}
+		numPatient = result[0]["COUNT(*)"];
+	});
+
+	if (numVisit != 0) {
+		if (numPatient == 0) {
 			response.sendStatus(404);
 		}
 		else {
 			response.send("This patient already exists");
 		}
 	}
-	else if (properties.visitCount(visitid) == 0) {
-		if (properties.patientIdCount(patientid) == 0) {
-			connection.query(properties.addPatient(), function (err) {
+	else if (numVisit == 0) {
+		if (numPatient == 0) {
+			connection.query(properties.addPatient(patientid, firstName, lastName, gender, middleName) , function (err) {
 				if (err) {
 					console.log(err.message);
 				}
-			});
-			connection.query(properties.addVisit(), function (err) {
-				if (err) {
-					console.log(err.message);
-				}
+				connection.query(properties.addVisit(visitid, admittime, dischargetime, patientid), function (err) {
+					if (err) {
+						console.log(err.message);
+					}
+				});
 			});
 		}
 		else {
-			connection.query(properties.addVisit(), function (err) {
+			connection.query(properties.addVisit(visitid, admittime, dischargetime, patientid), function (err) {
 				if (err) {
 					console.log(err.message);
 				}
 			});
 		}
 	}
-	
+	});
 });
 
 app.post('/api/doctorActivities', (request, response) => {
@@ -157,7 +185,7 @@ app.post('/api/doctorActivities', (request, response) => {
 
 //App Runner
 app.listen(3000, () => {
-    console.log(`Example app listening at http://localhost:${3000}`)
+    console.log(`Example app listening at http://localhost:${3000}`);
 });
 
 

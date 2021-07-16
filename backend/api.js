@@ -2,6 +2,7 @@ const mysql = require('mysql');
 const express = require('express');
 const cors = require('cors');
 const properties = require('./properties.js');
+const { SSL_OP_EPHEMERAL_RSA } = require('constants');
 
 const app = express();
 app.use(cors());
@@ -64,7 +65,7 @@ app.get('/api/doctorActivities', (request, response) => {
 //response -> [patientid, firstname, lastname, arr(visitid)] <- GET call to patients ? args can be any of the parameters
 app.get('/api/patients', (request, response) => {
 	//Precedence -> visitid, patientid, name
-	let patientid = request.query.patientid;
+	let visitid = request.query.visitid;
 	//connection.query("SELECT COUNT(*) FROM patient WHERE patientid=5", function (err, result) {
 	//	if (err) {
 	//		console.log(err.message);
@@ -72,18 +73,18 @@ app.get('/api/patients', (request, response) => {
 	//	let thing = result[0];
 	//	response.send(String(thing["COUNT(*)"])); //Cannot access the value inside the json
 	//});
-	connection.query(properties.patientIdCount(patientid), function (err, result) {
+	connection.query(properties.visitCount(visitid), function (err, result) {
 		if (err) {
 			console.log(err.message);
 		}
 		//let num = Object.values(result[0]);
-		response.send(result[0]["COUNT(*)"].toString());
+		response.send(result[0]);
 
 	})
 });
 
 //POST Procedures
-app.post('/api/patients', (request, response) => {//visit,patient,first, last, gender, middlename
+app.post('/api/patients', (request, response) => {
 	let patientid = request.query.patientid;
 	let firstName = request.query.firstName;
 	let lastName = request.query.lastName;
@@ -92,8 +93,9 @@ app.post('/api/patients', (request, response) => {//visit,patient,first, last, g
 	let visitid = request.query.visitid;
 	let admittime = request.query.admittime;
 	let dischargetime = request.query.dischargetime;
-	let numPatient = 0;
-	let numVisit = 0;
+	let inpatient = request.query.inpatient;
+	let numPatient = null;
+	let numVisit = null;
 
 
 	connection.query(properties.visitCount(visitid), function (err, result) {
@@ -101,44 +103,67 @@ app.post('/api/patients', (request, response) => {//visit,patient,first, last, g
 			console.log(err.message);
 		}
 		numVisit = result[0]["COUNT(*)"]; 
+		console.log(`Num visit is ${numVisit}`);
+	});
 
 	connection.query(properties.patientIdCount(patientid), function (err, result) {
 		if (err) {
 			console.log(err.message);
 		}
 		numPatient = result[0]["COUNT(*)"];
+		console.log(`Num patient is ${numPatient}`)
 	});
-
-	if (numVisit != 0) {
-		if (numPatient == 0) {
-			response.sendStatus(404);
+	async function init() {
+		await sleep(1000);
+		if (numVisit != 0) {
+			if (numPatient != 0) {
+				response.send("The patient and visit already exist");
+			}
+			else {
+				response.status(404).send("this is an error");
+			}
 		}
-		else {
-			response.send("This patient already exists");
-		}
-	}
-	else if (numVisit == 0) {
-		if (numPatient == 0) {
-			connection.query(properties.addPatient(patientid, firstName, lastName, gender, middleName) , function (err) {
-				if (err) {
-					console.log(err.message);
-				}
-				connection.query(properties.addVisit(visitid, admittime, dischargetime, patientid), function (err) {
+		else if (numVisit === 0) {
+			if (numPatient === 0) {
+				connection.query(properties.addPatient(patientid, firstName, lastName, gender, middleName) , function (err) {
+					if (err) {
+						console.log(err.message);
+					}
+					connection.query(properties.addVisit(visitid, admittime, dischargetime, patientid, inpatient), function (err) {
+						if (err) {
+							console.log(err.message);
+						}
+					});
+				});
+				response.send("Patient and visit created.");
+			}
+			else {
+				connection.query(properties.addVisit(visitid, admittime, dischargetime, patientid, inpatient), function (err) {
 					if (err) {
 						console.log(err.message);
 					}
 				});
-			});
+				response.send("Visit created.");
+			}
 		}
-		else {
-			connection.query(properties.addVisit(visitid, admittime, dischargetime, patientid), function (err) {
-				if (err) {
-					console.log(err.message);
-				}
-			});
+	  
+	  function sleep(ms) {
+		return new Promise((resolve) => {
+		  setTimeout(resolve, ms);
+		});
 		}
 	}
-	});
+	init()
+
+	//const wait = new Promise((resolve, reject) =>{
+	//	if (numPatient != null & numVisit != null) {
+	//		resolve(inserts(patientid, firstName, lastName, gender, middleName, visitid, admittime, dischargetime, patientid, inpatient, numVisit, numPatient));
+	//	}
+	//	else {
+	//		reject("")
+	//	}
+	//});
+
 });
 
 app.post('/api/doctorActivities', (request, response) => {
@@ -182,6 +207,43 @@ app.post('/api/doctorActivities', (request, response) => {
 		});
 	}
 });
+
+function inserts(patientid, firstName, lastName, gender, middleName, visitid, admittime, dischargetime, inpatient, numVisit, numPatient, response) {
+	if (numVisit != 0) {
+		if (numPatient != 0) {
+			response.send("The patient and visit already exist");
+		}
+		else {
+			response.status(404).send("this is an error");
+		}
+	}
+	else if (numVisit === 0) {
+		if (numPatient === 0) {
+			connection.query(properties.addPatient(patientid, firstName, lastName, gender, middleName) , function (err) {
+				if (err) {
+					console.log(err.message);
+				}
+				connection.query(properties.addVisit(visitid, admittime, dischargetime, patientid, inpatient), function (err) {
+					if (err) {
+						console.log(err.message);
+					}
+				});
+			});
+			response.send("Patient and visit created.");
+		}
+		else {
+			connection.query(properties.addVisit(visitid, admittime, dischargetime, patientid, inpatient), function (err) {
+				if (err) {
+					console.log(err.message);
+				}
+			});
+			response.send("Visit created.");
+		}
+	}
+}
+
+
+
 
 //App Runner
 app.listen(3000, () => {

@@ -42,8 +42,9 @@ connection.connect(function (err) {
 		}
 	});
 	
-    connection.end();
 });
+
+connection.end();
 
 
 //Array Form - [Activity ID, Type (Procedure or Consult), Category (procedureName), Name, code]

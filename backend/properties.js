@@ -58,7 +58,7 @@ let createVisit = `CREATE TABLE IF NOT EXISTS visit(
 		visitid INT PRIMARY KEY NOT NULL,
 		admittime DATETIME NOT NULL,
 		dischargetime DATETIME NOT NULL,
-		inpatient BOOLEAN NOT NULL,
+		inpatient BOOLEAN NOT NULL DEFAULT 0,
 		patientid INT NOT NULL,
 		FOREIGN KEY (patientid) REFERENCES patient(patientid)
 	)`;
@@ -82,7 +82,7 @@ let activitiesTemplate = "INSERT IGNORE INTO activities (activityid, type, categ
 let patientTemplate = "INSERT INTO patient (patientid, firstname, lastname, middlename, gender) VALUES ?";
 
 let addPatient = (patientid, firstname, lastname, gender, middlename = null,) => {
-	if (middlename == null) {
+	if (middlename === null) {
 		return `INSERT INTO patient (patientid, firstname, lastname, gender) VALUES (${patientid}, ${firstname}, ${lastname}, ${gender})`;
 	}
 	else {
@@ -96,7 +96,7 @@ let addDoctorActivity = (did, doctorid, visitid, activityid, proceduretime) => {
 
 let addVisit = (visitid, admittime, dischargetime, patientid, inpatient = true) => {
 	try { 
-		return `INSERT INTO visit (visitid, admittime, dischargetime, inpatient, patientid) VALUES (${visitid}, ${admittime}, ${dischargetime}, ${inpatient}, ${patientid})`;
+		return `INSERT INTO visit (visitid, admittime, dischargetime, patientid, inpatient) VALUES (${visitid}, ${admittime}, ${dischargetime}, ${patientid}, ${inpatient})`;
 	}
 	catch (e) {
 		console.log(e);
@@ -134,8 +134,8 @@ let patientIdCount = (patientid) => {
 	return query;
 }
 
-let visitCount = (visitid) => {
-	let query = "SELECT COUNT(*) FROM doctoractivity WHERE visitid=" + visitid;
+let visitCount = (visitid) => { //Should the count be from the doctoractivity table or the visit table
+	let query = "SELECT COUNT(*) FROM visit WHERE visitid=" + visitid;
 	let count = 0;
 	//connectionDb.query(query, function(err, result) {
 	//	if (err) {

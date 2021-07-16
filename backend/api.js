@@ -85,15 +85,15 @@ app.get('/api/patients', (request, response) => {
 
 //POST Procedures
 app.post('/api/patients', (request, response) => {
-	let patientid = request.query.patientid;
-	let firstName = request.query.firstName;
-	let lastName = request.query.lastName;
-	let middleName = request.query.middleName;
-	let gender = request.query.gender;
-	let visitid = request.query.visitid;
-	let admittime = request.query.admittime;
-	let dischargetime = request.query.dischargetime;
-	let inpatient = request.query.inpatient;
+	let patientid = request.Body.patientid;
+	let firstName = request.Body.firstName;
+	let lastName = request.Body.lastName;
+	let middleName = request.Body.middleName;
+	let gender = request.Body.gender;
+	let visitid = request.Body.visitid;
+	let admittime = request.Body.admittime;
+	let dischargetime = request.Body.dischargetime;
+	let inpatient = request.Body.inpatient;
 	let numPatient = null;
 	let numVisit = null;
 

@@ -8,16 +8,16 @@ let queryList = [];
 let connection = mysql.createConnection({
     host: "localhost",
 	port: 3306,
-    user: "projectuser",
-    password: "portalservice",
+    user: "root",
+    password: "Fa1rview",
 });
 queryList.push(connection);
 
 let connectionDb = mysql.createConnection({
     host: "localhost",
 	port: 3306,
-    user: "projectuser",
-    password: "portalservice",
+    user: "root",
+    password: "Fa1rview",
 	database: "patientdb"
 });
 
@@ -41,7 +41,7 @@ let createPatient = `CREATE TABLE IF NOT EXISTS patient(
 		patientid INT PRIMARY KEY NOT NULL,
 		firstname VARCHAR(45) NOT NULL,
 		lastname VARCHAR(45) NOT NULL,
-		middlename VARCHAR(45) DEFAULT "" NOT NULL,
+		middlename VARCHAR(45),
 		gender VARCHAR(1) NOT NULL
     )`;
 queryList.push(createPatient);
@@ -56,8 +56,8 @@ queryList.push(createDoctor);
 
 let createVisit = `CREATE TABLE IF NOT EXISTS visit(
 		visitid INT PRIMARY KEY NOT NULL,
-		admittime DATETIME NOT NULL,
-		dischargetime DATETIME NOT NULL,
+		admittime DATETIME,
+		dischargetime DATETIME,
 		inpatient BOOLEAN NOT NULL DEFAULT 0,
 		patientid INT NOT NULL,
 		FOREIGN KEY (patientid) REFERENCES patient(patientid)
@@ -83,10 +83,10 @@ let patientTemplate = "INSERT INTO patient (patientid, firstname, lastname, midd
 
 let addPatient = (patientid, firstname, lastname, gender, middlename = null,) => {
 	if (middlename === null) {
-		return `INSERT INTO patient (patientid, firstname, lastname, gender) VALUES (${patientid}, ${firstname}, ${lastname}, ${gender})`;
+		return `INSERT INTO patient (patientid, firstname, lastname, gender) VALUES (${patientid}, '${firstname}', '${lastname}', '${gender}')`;
 	}
 	else {
-		return `INSERT INTO patient (patientid, firstname, lastname, middlename, gender) VALUES (${patientid}, ${firstname}, ${lastname}, ${middlename}, ${gender})`;
+		return `INSERT INTO patient (patientid, firstname, lastname, middlename, gender) VALUES (${patientid}, '${firstname}', '${lastname}', '${middlename}', '${gender}')`;
 	}
 }
 
@@ -94,9 +94,9 @@ let addDoctorActivity = (did, doctorid, visitid, activityid, proceduretime) => {
 	return `INSERT INTO doctoractivity (did, doctorid, visitid, activityid, proceduretime) VALUES (${did}, ${doctorid}, ${visitid}, ${activityid}, ${proceduretime})`;
 }
 
-let addVisit = (visitid, admittime, dischargetime, patientid, inpatient = true) => {
+let addVisit = () => {
 	try { 
-		return `INSERT INTO visit (visitid, admittime, dischargetime, patientid, inpatient) VALUES (${visitid}, ${admittime}, ${dischargetime}, ${patientid}, ${inpatient})`;
+		return "INSERT INTO visit (visitid, admittime, dischargetime, patientid, inpatient) VALUES ?";
 	}
 	catch (e) {
 		console.log(e);

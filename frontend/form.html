@@ -1,58 +1,66 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>My Page!</title>
-        <link rel="stylesheet" href="form.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<script src=
+		"https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js">
+		</script>
+		<script src="form.js"></script>
+		<link rel="stylesheet" href="form.css">
     </head>
+
     <body>
-        <header>FORM</header>
+		<div id='info'></div>
+        <div class="container pt-4">
+            <div class="table-responsive">
+            <table id="procedureTable" class="table table-bordered">
+                <thead>
+
+                </thead>
+				<tbody>
+					<td id="FirstNameTag" class="text-left">
+						<label for="FirstName">
+							<b>First Name: </b>
+							
+						</label>
+						<input id ="FirstName"  type="text"/>
+
+					</td>
+					
+					<td id="LastNameTag" class="text-left"><label for="LastName"><b>Last Name: </b></label><input id="LastName" type="text"></td>
+				</tbody>
+            </table>
+            </div>
+        </div>
+		<div id='info'></div>
+        <div class="container pt-4">
+            <div class="table-responsive">
+            <table id="procedureTable" class="table table-bordered">
+                <thead>
+
+                </thead>
+				<tbody>
+					<td id="VisitIDTag" class="text-left"><label ><b>Visit ID: </b></label><input id="VisitID" type="number" placeholder="Only numbers"></td>
+					
+					<td id="PatientIDTag" class="text-left"><label ><b>Patient ID: </b></label><input id="PatientID" type="number" placeholder="Only numbers"></td>
+				</tbody>
+            </table>
+            </div>
+        </div>
+		<div style="text-align: center;">
+			<button class="btn btn-md btn-primary" id="saveBtnP" type="button" onclick="SaveDataPatient()">Save</button>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<button class="btn btn-md btn-primary" id="searchBtnP" type="button">Search</button>
+		</div>
+		<div id="PatientInfo">
+
+		</div>
+		<div id='info'></div>
+		<div id="allPrints">
+			
+		</div>
+
         
-            <section>
-                    <ul>
-                        <li>
-                            <label for="name">Name:</label>
-                            <input type="text" id ="name" name="user">
-                        </li>
-                        <li>
-                            <label for="Sex">Sex:</label>
-                            <input type="radio" id ="male" name="sex" value="male">
-                            <label for="male">Male</label>
-
-                            <input type="radio" id="female" name="sex" value="female">
-                            <label for="female">Female</label>
-                        </li>
-                        <li>
-                            <label for="age">Age:</label>
-                            <input type="text" id ="age" name="age">
-                        </li>
-                        <li>
-                            <label for="uniqueid">Unique id:</label>
-                            <input type="text" id="uniqueid"name="uniqueid">
-                        </li>
-
-                        <div class="tab">
-                            <button class="tablinks" onclick="openProcedure(event, 'Procedures')">Procedures</button>
-                            <button class="tablinks" onclick="openProcedure (event, 'Consultations')">Consultations</button>
-                            
-                        </div>
-                          
-                          <!-- Tab content -->
-                        <div id="Procedures" class="tabcontent">
-                            <h3>Procedures</h3>
-                            <p>EGD procedures</p>
-                        </div>
-                          
-                        <div id="Consultations" class="tabcontent">
-                            <h3>Consultations</h3>
-                            <p>Flex Sig procedures</p>
-                        </div>
-
-                        <li class="button">
-                            <button type="submit">Send</button>
-                        </li>
-                    </ul>
-        </section>
-        <script src="form.js"></script>
     </body>
-    
 </html>

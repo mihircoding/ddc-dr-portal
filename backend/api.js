@@ -4,9 +4,12 @@ const cors = require('cors');
 const properties = require('./properties.js');
 const { SSL_OP_EPHEMERAL_RSA } = require('constants');
 
+const { NEWDATE } = require('mysql/lib/protocol/constants/types');
+
 const app = express();
 app.use(cors());
 
+app.use(express.json());
 let connection = properties.connectionDb;
 //Cannot send a number in a response.
 
@@ -138,19 +141,67 @@ app.get('/api/patients', (request, response) => {
 
 //POST Procedures
 app.post('/api/patients', (request, response) => {
-	let patientid = request.Body.patientid;
-	let firstName = request.Body.firstName;
-	let lastName = request.Body.lastName;
-	let middleName = request.Body.middleName;
-	let gender = request.Body.gender;
-	let visitid = request.Body.visitid;
-	let admittime = request.Body.admittime;
-	let dischargetime = request.Body.dischargetime;
-	let inpatient = request.Body.inpatient;
+	console.log('the body is'+request.body
+	
+	);
+	let patientid = 0;
+	let firstName = null;
+	let lastName = null;
+	let middleName = null;
+	let gender = null;
+	let visitid = 0;
+	let admittime =new Date();
+	let dischargetime = null;
+	let inpatient = true;
 	let numPatient = null;
 	let numVisit = null;
-
-
+	
+	if( request.body.patientid) {
+		patientid=parseInt(request.body.patientid);
+	}
+	if( request.body.firstName) {
+		firstName=request.body.firstName;
+	}
+	if( request.body.lastName) {
+		lastName=request.body.lastName;
+	}
+	if( request.body.middleName) {
+		middleName=request.body.middleName;
+	}
+	if( request.body.gender) {
+		gender=request.body.gender;
+	}
+	if( request.body.visitid) {
+		visitid=parseInt(request.body.visitid);
+	}
+	if( request.body.admittime) {
+		admittime=request.body.admittime;
+	}
+	if( request.body.dischargetime) {
+		dischargetime=request.body.dischargetime;
+	}
+	if( request.body.inpatient) {
+		inpatient=request.body.inpatient;
+	}
+	if( request.body.numPatient) {
+		numPatient=request.body.numPatient;
+	}
+	if( request.body.numVisit) {
+		numVisit=request.body.numVisit;
+	}
+	/*
+	let firstName = request.body.firstName;
+	let lastName = request.body.lastName;
+	let middleName = request.body.middleName;
+	let gender = request.body.gender;
+	let visitid = request.body.visitid;
+	let admittime = request.body.admittime;
+	let dischargetime = request.body.dischargetime;
+	let inpatient = request.body.inpatient;
+	let numPatient = null;
+	let numVisit = null;
+	*/
+	console.log(patientid+"patientid");
 	connection.query(properties.visitCount(visitid), function (err, result) {
 		if (err) {
 			console.log(err.message);
@@ -178,11 +229,16 @@ app.post('/api/patients', (request, response) => {
 		}
 		else if (numVisit === 0) {
 			if (numPatient === 0) {
+				
 				connection.query(properties.addPatient(patientid, firstName, lastName, gender, middleName) , function (err) {
 					if (err) {
 						console.log(err.message);
 					}
-					connection.query(properties.addVisit(visitid, admittime, dischargetime, patientid, inpatient), function (err) {
+					
+					let rows=[
+						[visitid, admittime, dischargetime, patientid, inpatient]
+					];
+					connection.query(properties.addVisit(),[rows], function (err) {
 						if (err) {
 							console.log(err.message);
 						}
@@ -191,7 +247,10 @@ app.post('/api/patients', (request, response) => {
 				response.send("Patient and visit created.");
 			}
 			else {
-				connection.query(properties.addVisit(visitid, admittime, dischargetime, patientid, inpatient), function (err) {
+				let rows=[
+					[visitid, admittime, dischargetime, patientid, inpatient]
+				];
+				connection.query(properties.addVisit(),[rows], function (err) {
 					if (err) {
 						console.log(err.message);
 					}

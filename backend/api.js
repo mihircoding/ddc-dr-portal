@@ -61,11 +61,13 @@ app.get('/api/activities', (request, response) => {
 //This is just to test
 app.get('/api/doctorActivities', (request, response) => {
 	//[category, activityname, activitycode]
-	let firstname = "First";
-	let lastname = "Last";
-	let query = `SELECT * FROM visit WHERE visitid=1`;
-	connection.query(query, function(err, result) {
-		response.send(result);
+	let query = properties.findActivityID(99254);
+	connection.query(query, function (err, result) {
+		if (err) {
+			console.log(err.message);
+		}
+		activityid = result[0]["activityid"];
+		response.send(String(activityid));
 	});
 });
 
@@ -150,7 +152,7 @@ app.post('/api/patients', (request, response) => {
 	let middleName = null;
 	let gender = null;
 	let visitid = 0;
-	let admittime =new Date();
+	let admittime = new Date();
 	let dischargetime = null;
 	let inpatient = true;
 	let numPatient = null;
@@ -267,6 +269,50 @@ app.post('/api/patients', (request, response) => {
 	}
 	init()
 
+});
+
+app.post('/api/procedures', (request, response) => {
+	// [did, doctorid, visitid, activityid, procedureTime]
+	let did = 0;
+	let doctorid = 0;
+	let visitid = 0;
+	let activityid = null;
+	let code = 0;
+	let procedureTime = new Date();
+
+	if (request.body.doctorid) {
+		doctorid = parseInt(request.body.doctorid);
+	}
+	
+	if (request.body.visitid) {
+		visitid = parseInt(request.body.visitid);
+	}
+
+	if (request.body.code) {
+		code = parseInt(request.body.code);
+	}
+
+	if (request.body.procedureTime) {
+		procedureTime = request.body.procedureTime;
+	}
+
+	if (request.body.did) {
+		did = parseInt(request.body.did);
+	}
+	
+	let query = properties.findActivityID(code);
+	connection.query(query, function (err, result) {
+		if (err) {
+			console.log(err.message);
+		}
+		activityid = result[0]["activityid"];
+	});
+
+	connection.query(properties.addDoctorActivity(did, docctorid, visitid, activityid, procedureTime), function (err) {
+		if (err) {
+			console.log(err.message);
+		}
+	});
 
 });
 

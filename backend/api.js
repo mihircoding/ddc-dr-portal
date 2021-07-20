@@ -95,7 +95,7 @@ app.post('/api/patients', (request, response) => {
 	let firstName = null;
 	let lastName = null;
 	let middleName = null;
-	let gender = null;
+	let gender = "M";
 	let visitid = 0;
 	let admittime =new Date();
 	let dischargetime = null;
@@ -115,6 +115,7 @@ app.post('/api/patients', (request, response) => {
 	if( request.body.middleName) {
 		middleName=request.body.middleName;
 	}
+	console.log(request.body.gender+"the request gender");
 	if( request.body.gender) {
 		gender=request.body.gender;
 	}
@@ -176,7 +177,7 @@ app.post('/api/patients', (request, response) => {
 		}
 		else if (numVisit === 0) {
 			if (numPatient === 0) {
-				
+				console.log(gender +'this is the gender');
 				connection.query(properties.addPatient(patientid, firstName, lastName, gender, middleName) , function (err) {
 					if (err) {
 						console.log(err.message);

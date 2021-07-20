@@ -113,7 +113,7 @@
 				var currentText = $(`#droptwo${rowId} option:selected`).text();
 				var procedureText = $(`#dropone${rowId} option:selected`).text();
 				var dateText = $(`#datepicker${rowId}`).val();
-				
+				saveProcedure();
 				$(`#droptwo${rowId}`).remove();
 				$(`#dropone${rowId}`).remove();
 				$(`#datepicker${rowId}`).remove();
@@ -132,6 +132,7 @@
 				$(`#R${rowId}3`).html(`<input type = 'date' id = 'datepicker${rowId}' name = 'datepicker'>`);
 				$(`#saveBtn${rowId}`).html('&#x1f4be');
 				$(`#saveBtn${rowId}`).attr("onclick",`editData(${rowId})`);
+				
 			}
 			function addDeleteButton(rowId){
 				var button = `<button class="btn btn-md btn-primary" id="delBtn${rowId}" type="button" onclick="delData(${rowId})">&#x1f5d1</button>`;
@@ -196,30 +197,53 @@
 				addDropDownTwo(selected.value,selected.id);
 				
 			}
+			
 			function savePatient(){
-
+				alert($(`#VisitID`).val());
 				var holdervar1 = $(`#VisitID`).val();
 				var holdervar2 = $(`#PatientID`).val();
 				var holdervar3 = $(`#FirstName`).val();
 				var holdervar4 = $(`#LastName`).val();
 				var myObject = new Object();
+				
 				myObject.patientid = holdervar2;
 				myObject.firstName = holdervar3;
 				myObject.lastName = holdervar4;
 				myObject.middleName = "bob";
-				myObject.gender = 'M'
+				myObject.gender = "M";
+				myObject.visitid = holdervar1;
 				var myStr = JSON.stringify(myObject);
 				console.log(myStr);
-				var url = 'http://localhost:3000/api/patients'
-				var method = 'POST'
+				var url = 'http://localhost:3000/api/patients';
+				var method = 'POST';
 				callAjax(url,method,myStr);
 			}
+			
+			function saveProcedure () {
+				alert($(`#R${rowId}1`).val())
+				var holdervar1 = $(`#VisitID`).val();
+				var holdervar2 = $(`#droptwo${rowId} option:selected`).val();
+				var holdervar3 = $(`#datepicker${rowId} option:selected`).val();
+				
 
+				var myObject = new Object();
+				myObject.visitid = holdervar1;
+				myObject.doctorid = 123;
+				myObject.code = holdervar2;
+				myObject.procedureTime = holdervar3;
+				var myStr = JSON.stringify(myObject);
+				console.log(myStr);
+				var url = 'http://localhost:3000/api/doctorActivities';
+				var method = 'POST';
+				callAjax(url,method,myStr);
+			}
+			
 			function callAjax(uri, method, formData) {
 				return $.ajax({
 				url: uri,
 				crossDomain:true,
-				// dataType: 'jsonp',
+				//dataType: 'json',
+				contentType: 'application/json; charset=utf-8',
 				accepts:'application/json',
 				data: formData,
 				type: method

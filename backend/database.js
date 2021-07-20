@@ -3,8 +3,8 @@ const mysql = require('mysql');
 let connection = mysql.createConnection({
 	host: "localhost",
 	port: 3306,
-    user: "projectuser",
-    password: "portalservice",
+    user: "root",
+    password: "Fa1rview",
 });
 
 //CREATE DATABASE IN CASE IT HAS NOT ALREADY BEEN CREATED

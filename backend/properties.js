@@ -8,16 +8,16 @@ let queryList = [];
 let connection = mysql.createConnection({
     host: "localhost",
 	port: 3306,
-    user: "root",
-    password: "Fa1rview",
+    user: "projectuser",
+    password: "portalservice",
 });
 queryList.push(connection);
 
 let connectionDb = mysql.createConnection({
     host: "localhost",
 	port: 3306,
-    user: "root",
-    password: "Fa1rview",
+    user: "projectuser",
+    password: "portalservice",
 	database: "patientdb"
 });
 
@@ -148,6 +148,14 @@ let visitCount = (visitid) => { //Should the count be from the doctoractivity ta
 }
 
 //Other
+let findVisits = (visitid) => {
+	let query = `SELECT * FROM visit WHERE visitid=${visitid}`;
+	return query;
+}
+
+let findActivityID = (code) => {
+	return `SELECT activityid FROM activities WHERE code=${code}`
+}
 
 //Utilizes all the above queries to create database
 function createDatabase() {
@@ -197,5 +205,9 @@ module.exports = {
 
 	patientIdCount: patientIdCount,
 
-	addVisit: addVisit
+	addVisit: addVisit,
+
+	findVisits: findVisits,
+
+	findActivityID: findActivityID
 };

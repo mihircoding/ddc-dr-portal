@@ -37,6 +37,7 @@ app.get('/api/procedureDropdowns', (request, response) => {
 });
 
 
+
 app.get('/api/activities', (request, response) => {
     let category = request.query.procedureName;
 	
@@ -56,35 +57,89 @@ app.get('/api/activities', (request, response) => {
 	});
 });
 
+
+//This is just to test
 app.get('/api/doctorActivities', (request, response) => {
-	let visitid = request.query.visitid; //Should be an array
-	let activityid = 0;
 	//[category, activityname, activitycode]
-	let query = `SELECT activityid FROM doctoractivity WHERE visitid=${visitid}`;
-	connection.query(query, function(err, result) {
-		response.send(result);
-	});
-});
-//response -> [patientid, firstname, lastname, arr(visitid)] <- GET call to patients ? args can be any of the parameters
-app.get('/api/patients', (request, response) => {
-	//Precedence -> visitid, patientid, name
-	let visitid = request.query.visitid;
-	//connection.query("SELECT COUNT(*) FROM patient WHERE patientid=5", function (err, result) {
-	//	if (err) {
-	//		console.log(err.message);
-	//	}
-	//	let thing = result[0];
-	//	response.send(String(thing["COUNT(*)"])); //Cannot access the value inside the json
-	//});
-	connection.query(properties.visitCount(visitid), function (err, result) {
+	let query = properties.findActivityID(99254);
+	connection.query(query, function (err, result) {
 		if (err) {
 			console.log(err.message);
 		}
-		//let num = Object.values(result[0]);
-		response.send(result[0]);
-
-	})
+		activityid = result[0]["activityid"];
+		response.send(String(activityid));
+	});
 });
+
+
+
+//response -> [patientid, firstname, lastname, arr(visitid)] <- GET call to patients ? args can be any of the parameters
+//Use promises the same way here.
+app.get('/api/patients', (request, response) => {
+	//Precedence -> visitid, patientid, name
+	let visitid = request.query.visitid;
+	let patientid = request.query.patientid;
+	let firstname = request.query.firstName;
+	let lastname = request.query.lastName;
+	
+	let visits = [];
+	async function init() {
+		await sleep(1000);
+		if (visitid != null) {
+			let query = properties.findVisits(visitid);
+			connection.query(query, function (err, result) {
+				if (err) {
+					console.log(err.message);
+				}
+				response.send(Object.values(result[0]));		
+			});	
+		}
+		
+		if (patientid != null) {
+			let getVisits = "SELECT * FROM visit WHERE patientid=" + patientid;
+			visits = []; //Stores the seperate visits in array format
+	
+			connection.query(getVisits, function (err, result) {
+				if (err) {
+					console.log(err.message);
+				}
+				result.forEach(element => {
+					visits.push(element);
+				});
+			});
+	
+			response.send(visits);
+		}
+	
+		//What happens if there are more than one patientid
+		connection.query(`SELECT patientid FROM patient WHERE firstname=${firstname} AND lastname=${lastname}`, function (err, result) {
+			if (err) {
+				console.log(err.message);
+			}
+			patientid = result[0]["patientid"];
+	
+			let getVisits = "SELECT * FROM visit WHERE patientid=" + patientid;
+			visits = []; //Stores the seperate visits in array format
+	
+			connection.query(getVisits, function (err, result) {
+				result.forEach(element => {
+					visits.push(element);
+				});
+			});
+	
+			response.send(visits);
+		});
+	  
+	  function sleep(ms) {
+		return new Promise((resolve) => {
+		  setTimeout(resolve, ms);
+		});
+		}
+	}
+	init();
+});
+
+
 
 //POST Procedures
 app.post('/api/patients', (request, response) => {
@@ -97,7 +152,7 @@ app.post('/api/patients', (request, response) => {
 	let middleName = null;
 	let gender = "M";
 	let visitid = 0;
-	let admittime =new Date();
+	let admittime = new Date();
 	let dischargetime = null;
 	let inpatient = true;
 	let numPatient = null;
@@ -215,14 +270,50 @@ app.post('/api/patients', (request, response) => {
 	}
 	init()
 
-	//const wait = new Promise((resolve, reject) =>{
-	//	if (numPatient != null & numVisit != null) {
-	//		resolve(inserts(patientid, firstName, lastName, gender, middleName, visitid, admittime, dischargetime, patientid, inpatient, numVisit, numPatient));
-	//	}
-	//	else {
-	//		reject("")
-	//	}
-	//});
+});
+
+app.post('/api/procedures', (request, response) => {
+	// [did, doctorid, visitid, activityid, procedureTime]
+	let did = 0;
+	let doctorid = 0;
+	let visitid = 0;
+	let activityid = null;
+	let code = 0;
+	let procedureTime = new Date();
+
+	if (request.body.doctorid) {
+		doctorid = parseInt(request.body.doctorid);
+	}
+	
+	if (request.body.visitid) {
+		visitid = parseInt(request.body.visitid);
+	}
+
+	if (request.body.code) {
+		code = parseInt(request.body.code);
+	}
+
+	if (request.body.procedureTime) {
+		procedureTime = request.body.procedureTime;
+	}
+
+	if (request.body.did) {
+		did = parseInt(request.body.did);
+	}
+	
+	let query = properties.findActivityID(code);
+	connection.query(query, function (err, result) {
+		if (err) {
+			console.log(err.message);
+		}
+		activityid = result[0]["activityid"];
+	});
+
+	connection.query(properties.addDoctorActivity(did, docctorid, visitid, activityid, procedureTime), function (err) {
+		if (err) {
+			console.log(err.message);
+		}
+	});
 
 });
 
@@ -267,42 +358,6 @@ app.post('/api/doctorActivities', (request, response) => {
 		});
 	}
 });
-
-function inserts(patientid, firstName, lastName, gender, middleName, visitid, admittime, dischargetime, inpatient, numVisit, numPatient, response) {
-	if (numVisit != 0) {
-		if (numPatient != 0) {
-			response.send("The patient and visit already exist");
-		}
-		else {
-			response.status(404).send("this is an error");
-		}
-	}
-	else if (numVisit === 0) {
-		if (numPatient === 0) {
-			connection.query(properties.addPatient(patientid, firstName, lastName, gender, middleName) , function (err) {
-				if (err) {
-					console.log(err.message);
-				}
-				connection.query(properties.addVisit(visitid, admittime, dischargetime, patientid, inpatient), function (err) {
-					if (err) {
-						console.log(err.message);
-					}
-				});
-			});
-			response.send("Patient and visit created.");
-		}
-		else {
-			connection.query(properties.addVisit(visitid, admittime, dischargetime, patientid, inpatient), function (err) {
-				if (err) {
-					console.log(err.message);
-				}
-			});
-			response.send("Visit created.");
-		}
-	}
-}
-
-
 
 
 //App Runner

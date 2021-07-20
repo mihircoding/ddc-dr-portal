@@ -148,6 +148,10 @@ let visitCount = (visitid) => { //Should the count be from the doctoractivity ta
 }
 
 //Other
+let findVisits = (visitid) => {
+	let query = `SELECT * FROM visit WHERE visitid=${visitid}`;
+	return query;
+}
 
 //Utilizes all the above queries to create database
 function createDatabase() {
@@ -197,5 +201,7 @@ module.exports = {
 
 	patientIdCount: patientIdCount,
 
-	addVisit: addVisit
+	addVisit: addVisit,
+
+	findVisits: findVisits
 };

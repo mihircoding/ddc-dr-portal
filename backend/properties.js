@@ -8,16 +8,16 @@ let queryList = [];
 let connection = mysql.createConnection({
     host: "localhost",
 	port: 3306,
-    user: "projectuser",
-    password: "portalservice",
+    user: "root",
+    password: "Fa1rview",
 });
 queryList.push(connection);
 
 let connectionDb = mysql.createConnection({
     host: "localhost",
 	port: 3306,
-    user: "projectuser",
-    password: "portalservice",
+    user: "root",
+    password: "Fa1rview",
 	database: "patientdb"
 });
 
@@ -91,7 +91,7 @@ let addPatient = (patientid, firstname, lastname, gender, middlename = null,) =>
 }
 
 let addDoctorActivity = (did, doctorid, visitid, activityid, proceduretime) => {
-	return `INSERT INTO doctoractivity (did, doctorid, visitid, activityid, proceduretime) VALUES (${did}, ${doctorid}, ${visitid}, ${activityid}, ${proceduretime})`;
+	return `INSERT INTO doctoractivity (did, doctorid, visitid, activityid, proceduretime) VALUES (${did}, ${doctorid}, ${visitid}, ${activityid}, "${proceduretime}")`;
 }
 
 let addVisit = () => {

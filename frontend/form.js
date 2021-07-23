@@ -113,7 +113,8 @@
 				var currentText = $(`#droptwo${rowId} option:selected`).text();
 				var procedureText = $(`#dropone${rowId} option:selected`).text();
 				var dateText = $(`#datepicker${rowId}`).val();
-				saveProcedure();
+				var testingvar1 = $(`#droptwo${rowId} option:selected`).val();
+				saveProcedure(testingvar1,dateText);
 				$(`#droptwo${rowId}`).remove();
 				$(`#dropone${rowId}`).remove();
 				$(`#datepicker${rowId}`).remove();
@@ -199,7 +200,7 @@
 			}
 			
 			function savePatient(){
-				alert($(`#VisitID`).val());
+				
 				var holdervar1 = $(`#VisitID`).val();
 				var holdervar2 = $(`#PatientID`).val();
 				var holdervar3 = $(`#FirstName`).val();
@@ -219,21 +220,22 @@
 				callAjax(url,method,myStr);
 			}
 			
-			function saveProcedure () {
-				alert($(`#R${rowId}1`).val())
+			function saveProcedure (dropdown2,date) {
 				var holdervar1 = $(`#VisitID`).val();
-				var holdervar2 = $(`#droptwo${rowId} option:selected`).val();
-				var holdervar3 = $(`#datepicker${rowId} option:selected`).val();
+				var today = new Date();
+				var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+				finalDate = date +" "+ time;
 				
-
 				var myObject = new Object();
 				myObject.visitid = holdervar1;
-				myObject.doctorid = 123;
-				myObject.code = holdervar2;
-				myObject.procedureTime = holdervar3;
+				myObject.doctorid = 3;
+				myObject.did = 4; //should be random id for each new row
+				myObject.code = dropdown2;
+				myObject.procedureTime = finalDate;
+				
 				var myStr = JSON.stringify(myObject);
 				console.log(myStr);
-				var url = 'http://localhost:3000/api/doctorActivities';
+				var url = 'http://localhost:3000/api/procedures';
 				var method = 'POST';
 				callAjax(url,method,myStr);
 			}

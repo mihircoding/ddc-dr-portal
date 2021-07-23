@@ -218,7 +218,7 @@ app.post('/api/patients', (request, response) => {
 			console.log(err.message);
 		}
 		numPatient = result[0]["COUNT(*)"];
-		console.log(`Num patient is ${numPatient}`)
+		console.log(`Num patient is ${numPatient}`);
 	});
 	async function init() {
 		await sleep(1000);
@@ -232,7 +232,6 @@ app.post('/api/patients', (request, response) => {
 		}
 		else if (numVisit === 0) {
 			if (numPatient === 0) {
-				console.log(gender +'this is the gender');
 				connection.query(properties.addPatient(patientid, firstName, lastName, gender, middleName) , function (err) {
 					if (err) {
 						console.log(err.message);
@@ -277,7 +276,7 @@ app.post('/api/procedures', (request, response) => {
 	let did = 0;
 	let doctorid = 0;
 	let visitid = 0;
-	let activityid = null;
+	let activityid = 0;
 	let code = 0;
 	let procedureTime = new Date();
 
@@ -300,21 +299,20 @@ app.post('/api/procedures', (request, response) => {
 	if (request.body.did) {
 		did = parseInt(request.body.did);
 	}
-	
 	let query = properties.findActivityID(code);
-	connection.query(query, function (err, result) {
-		if (err) {
-			console.log(err.message);
-		}
-		activityid = result[0]["activityid"];
-	});
+		connection.query(query, function (err, result) {
+			if (err) {
+				console.log(err.message);
+			}
+			activityid = result[0]["activityid"]; 
 
-	connection.query(properties.addDoctorActivity(did, docctorid, visitid, activityid, procedureTime), function (err) {
-		if (err) {
-			console.log(err.message);
-		}
-	});
-
+			connection.query(properties.addDoctorActivity(did, doctorid, visitid, activityid, procedureTime), function (err) {
+				if (err) {
+					console.log(err.message);
+				}
+				response.send("created");
+			});
+		});
 });
 
 app.post('/api/doctorActivities', (request, response) => {

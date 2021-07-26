@@ -5,6 +5,7 @@ const properties = require('./properties.js');
 const { SSL_OP_EPHEMERAL_RSA } = require('constants');
 
 const { NEWDATE } = require('mysql/lib/protocol/constants/types');
+const { json } = require('express');
 
 const app = express();
 app.use(cors());
@@ -273,7 +274,7 @@ app.post('/api/patients', (request, response) => {
 
 app.post('/api/procedures', (request, response) => {
 	// [did, doctorid, visitid, activityid, procedureTime]
-	let did = 0;
+	let did = "";
 	let doctorid = 0;
 	let visitid = 0;
 	let activityid = 0;
@@ -297,7 +298,8 @@ app.post('/api/procedures', (request, response) => {
 	}
 
 	if (request.body.did) {
-		did = parseInt(request.body.did);
+		did = request.body.did;
+		console.log("this is the did" + did);
 	}
 	let query = properties.findActivityID(code);
 		connection.query(query, function (err, result) {
@@ -308,9 +310,11 @@ app.post('/api/procedures', (request, response) => {
 
 			connection.query(properties.addDoctorActivity(did, doctorid, visitid, activityid, procedureTime), function (err) {
 				if (err) {
+					console.log("doctor activity failed");
 					console.log(err.message);
 				}
 				response.send("created");
+				
 			});
 		});
 });

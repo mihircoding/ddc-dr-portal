@@ -65,7 +65,7 @@ let createVisit = `CREATE TABLE IF NOT EXISTS visit(
 queryList.push(createVisit);
 
 let createDoctorVisit = `CREATE TABLE IF NOT EXISTS doctoractivity(
-			did INT PRIMARY KEY NOT NULL,
+			did VARCHAR(45) PRIMARY KEY NOT NULL,
 			doctorid INT NOT NULL,
 			visitid INT NOT NULL,
 			activityid INT NOT NULL,
@@ -91,7 +91,7 @@ let addPatient = (patientid, firstname, lastname, gender, middlename = null,) =>
 }
 
 let addDoctorActivity = (did, doctorid, visitid, activityid, proceduretime) => {
-	return `INSERT INTO doctoractivity (did, doctorid, visitid, activityid, proceduretime) VALUES (${did}, ${doctorid}, ${visitid}, ${activityid}, "${proceduretime}")`;
+	return `INSERT INTO doctoractivity (did, doctorid, visitid, activityid, proceduretime) VALUES ('${did}', ${doctorid}, ${visitid}, ${activityid}, "${proceduretime}")`;
 }
 
 let addVisit = () => {

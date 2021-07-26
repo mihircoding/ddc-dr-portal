@@ -78,7 +78,8 @@
 							<td id='R${rowId}3'>${dateBtn}</td> 
 							<td id='R${rowId}4'>${saveBtn}</td> 
 							<td id='R${rowId}5'>${delBtn}</td> 
-							</tr>`;
+							</tr>
+							<input type="hidden" id="P${rowId}">`;
 				
 				
 				if(rowId === 1) {
@@ -114,7 +115,8 @@
 				var procedureText = $(`#dropone${rowId} option:selected`).text();
 				var dateText = $(`#datepicker${rowId}`).val();
 				var testingvar1 = $(`#droptwo${rowId} option:selected`).val();
-				saveProcedure(testingvar1,dateText);
+				var guuid = saveProcedure(testingvar1,dateText);
+				$(`#P${rowId}`).val(guuid);
 				$(`#droptwo${rowId}`).remove();
 				$(`#dropone${rowId}`).remove();
 				$(`#datepicker${rowId}`).remove();
@@ -229,7 +231,8 @@
 				var myObject = new Object();
 				myObject.visitid = holdervar1;
 				myObject.doctorid = 3;
-				myObject.did = 4; //should be random id for each new row
+				myObject.did = createUUID();
+				alert(myObject.did); //should be random id for each new row
 				myObject.code = dropdown2;
 				myObject.procedureTime = finalDate;
 				
@@ -238,8 +241,18 @@
 				var url = 'http://localhost:3000/api/procedures';
 				var method = 'POST';
 				callAjax(url,method,myStr);
+				return myObject.did;
 			}
+
+			function createUUID() {
+				return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+				   var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+				   return v.toString(16);
+				});
+			 }
+
 			
+		
 			function callAjax(uri, method, formData) {
 				return $.ajax({
 				url: uri,

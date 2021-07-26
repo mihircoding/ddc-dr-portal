@@ -319,6 +319,20 @@ app.post('/api/procedures', (request, response) => {
 		});
 });
 
+app.delete('/api/procedures/:id', (request, response) => {
+	const did = request.params.id;
+	let deldid = `DELETE FROM doctoractivity WHERE did = '${did}'`;
+	
+	connection.query(deldid,function(err,result) {
+		if (err) {
+			console.log(err.message);
+		}
+		else {
+			console.log("the delete was successful");
+		}
+	});
+});
+
 app.post('/api/doctorActivities', (request, response) => {
 	//activityid or code
 	//doctorid or doctorname

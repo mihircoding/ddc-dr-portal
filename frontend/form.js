@@ -117,6 +117,7 @@
 				var testingvar1 = $(`#droptwo${rowId} option:selected`).val();
 				var guuid = saveProcedure(testingvar1,dateText);
 				$(`#P${rowId}`).val(guuid);
+				
 				$(`#droptwo${rowId}`).remove();
 				$(`#dropone${rowId}`).remove();
 				$(`#datepicker${rowId}`).remove();
@@ -142,12 +143,10 @@
 				return button;
 			}
 			function delData(rowId){
+				if ($(`#P${rowId}`).val()) {
+					delProcedure(rowId);
+				}
 				$(`#R${rowId}`).remove();
-				/*$(`#delBtn${rowId}5`).remove();
-				$(`#saveBtn${rowId}4`).remove();
-				$('#datepicker').remove();
-				$('#droptwo1').remove();
-				$('#dropone1').remove();*/
 			}
 			function addDropDownOne(rowId) {
 				console.log("addDropDownOne is called");
@@ -231,8 +230,7 @@
 				var myObject = new Object();
 				myObject.visitid = holdervar1;
 				myObject.doctorid = 3;
-				myObject.did = createUUID();
-				alert(myObject.did); //should be random id for each new row
+				myObject.did = createUUID();//should be random id for each new row
 				myObject.code = dropdown2;
 				myObject.procedureTime = finalDate;
 				
@@ -251,8 +249,16 @@
 				});
 			 }
 
-			
-		
+			function delProcedure (rowId) {
+				
+				var delRowHiddenID = $(`#P${rowId}`).val();
+				
+				var url = 'http://localhost:3000/api/procedures/' + delRowHiddenID;
+				var method = 'DELETE';
+				
+				callAjax(url,method);
+			}
+
 			function callAjax(uri, method, formData) {
 				return $.ajax({
 				url: uri,

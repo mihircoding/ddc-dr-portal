@@ -153,8 +153,17 @@ let findVisits = (visitid) => {
 	return query;
 }
 
+let getVisits = (patientid) => {
+	let query = `SELECT * FROM visit WHERE patientid=${patientid}`;
+	return query;
+}
+
 let findActivityID = (code) => {
 	return `SELECT activityid FROM activities WHERE code=${code}`
+}
+
+let getPatientID = (firstname, lastname) => {
+	return `SELECT * FROM patient WHERE firstname='${firstname}' AND lastname=${lastname}`;
 }
 
 //Utilizes all the above queries to create database
@@ -209,5 +218,9 @@ module.exports = {
 
 	findVisits: findVisits,
 
-	findActivityID: findActivityID
+	findActivityID: findActivityID,
+
+	getVisits: getVisits,
+
+	getPatientID: getPatientID
 };

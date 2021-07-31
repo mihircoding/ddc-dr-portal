@@ -258,6 +258,7 @@
 				
 				callAjax(url,method);
 			}
+			
 
 			function callAjax(uri, method, formData) {
 				return $.ajax({

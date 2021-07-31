@@ -148,8 +148,24 @@ let visitCount = (visitid) => { //Should the count be from the doctoractivity ta
 }
 
 //Other
-let findVisits = (visitid) => {
-	let query = `SELECT * FROM visit WHERE visitid=${visitid}`;
+let findVisitsWithVisitId = (visitid) => {
+	let query = `select v.visitid, p.patientid, p.firstname, p.lastname, p.middlename, p.gender from  patient p, visit v where v.patientid=p.patientid and v.visitid=${visitid}`;
+	return query;
+}
+let findVisitsWithPatientId = (patientid) => {
+	let query = `select v.visitid, p.patientid, p.firstname, p.lastname, p.middlename, p.gender from  patient p, visit v where v.patientid=p.patientid and p.patientid=${patientid}`;
+	return query;
+}
+let findVisitsWithFirstname = (name) => {
+	let query = `select v.visitid, p.patientid, p.firstname, p.lastname, p.middlename, p.gender from  patient p, visit v where v.patientid=p.patientid and p.firstname='${name}'`;
+	return query;
+}
+let findVisitsWithLastname = (name) => {
+	let query = `select v.visitid, p.patientid, p.firstname, p.lastname, p.middlename, p.gender from  patient p, visit v where v.patientid=p.patientid and p.lastname='${name}'`;
+	return query;
+}
+let findVisitsWithName = (fname, lname) => {
+	let query = `select v.visitid, p.patientid, p.firstname, p.lastname, p.middlename, p.gender from  patient p, visit v where v.patientid=p.patientid and p.firstname='${fname}' and p.lastname='${lname}'`;
 	return query;
 }
 
@@ -216,11 +232,14 @@ module.exports = {
 
 	addVisit: addVisit,
 
-	findVisits: findVisits,
+	getVisits: getVisits,
 
 	findActivityID: findActivityID,
 
-	getVisits: getVisits,
-
+	findVisitsWithVisitId: findVisitsWithVisitId,
+	findVisitsWithPatientId: findVisitsWithPatientId,
+	findVisitsWithName: findVisitsWithName,
+	findVisitsWithLastname: findVisitsWithLastname,
+	findVisitsWithFirstname: findVisitsWithFirstname,
 	getPatientID: getPatientID
 };

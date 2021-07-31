@@ -7,6 +7,7 @@ const { SSL_OP_EPHEMERAL_RSA } = require('constants');
 const { NEWDATE } = require('mysql/lib/protocol/constants/types');
 const { json } = require('express');
 
+
 const app = express();
 app.use(cors());
 
@@ -64,7 +65,7 @@ app.get('/api/doctorActivities', (request, response) => {
 	let visitid = null;
 	let patientid = null;
 	let firstname = null;
-	let lastname;
+	let lastname = null;
 
 	if (request.body.visitid) {
 		visitid = parseInt(request.body.visitid);
@@ -83,7 +84,7 @@ app.get('/api/doctorActivities', (request, response) => {
 		await sleep(1000);
 		
 		if (visitid != null) {
-			let query = `SELECT * FROM doctoractivities WHERE visitid=${visitid}`;
+			let query = `SELECT * FROM doctoractivity WHERE visitid=${visitid}`;
 			connection.query(query, function(err, result) {
 				if (err) {
 					console.log(err.message);
@@ -102,7 +103,7 @@ app.get('/api/doctorActivities', (request, response) => {
 				})
 
 				visits.forEach(element => {
-					let query = `SELECT * FROM doctoractivities WHERE visitid=${element}`;
+					let query = `SELECT * FROM doctoractivity WHERE visitid=${element}`;
 					connection.query(query, function(err, result) {
 						if (err) {
 							console.log(err.message);
@@ -135,7 +136,7 @@ app.get('/api/doctorActivities', (request, response) => {
 					})
 
 					visits.forEach(item => {
-						let query = `SELECT * FROM doctoractivities WHERE visitid=${item}`;
+						let query = `SELECT * FROM doctoractivity WHERE visitid=${item}`;
 						connection.query(query, function (err, result) {
 							if (err) {
 								console.log(err.message);
@@ -162,58 +163,83 @@ app.get('/api/doctorActivities', (request, response) => {
 //Use promises the same way here.
 app.get('/api/patients', (request, response) => {
 	//Precedence -> visitid, patientid, name
-	let visitid = request.query.visitid;
-	let patientid = request.query.patientid;
-	let firstname = request.query.firstName;
-	let lastname = request.query.lastName;
-	
-	let visits = [];
+	let visitid = 0;
+	let patientid = 0;
+	let lastname = null;
+	let firstname = null;
+
+	if( request.query.patientid) {
+		patientid=parseInt(request.query.patientid);
+	}
+	if( request.query.visitid) {
+		visitid=parseInt(request.query.visitid);
+	}
+	if( request.query.firstname) {
+		firstname=request.query.firstname;
+	}
+	if( request.query.lastname) {
+		lastname=request.query.lastname;
+	}
+    
 	async function init() {
 		await sleep(1000);
-		if (visitid != null) {
-			let query = properties.findVisits(visitid);
+		if (visitid != 0 ) {
+			let query = properties.findVisitsWithVisitId(visitid);
+			console.log("the visit query is "+ query);
 			connection.query(query, function (err, result) {
 				if (err) {
-					console.log(err.message);
+					console.log("error in visit id "+err.message);
+					response.status(404).send(err);
 				}
-				response.send(Object.values(result[0]));		
+				response.send(result);		
 			});	
 		}
 		
-		if (patientid != null) {
-			let getVisits = "SELECT * FROM visit WHERE patientid=" + patientid;
+		else if (patientid != 0) {
+			let getVisits = properties.findVisitsWithPatientId(patientid);
+			console.log("patient id query is"+ getVisits);
 			visits = []; //Stores the seperate visits in array format
 	
 			connection.query(getVisits, function (err, result) {
 				if (err) {
 					console.log(err.message);
+					response.status(404).send(err);
 				}
-				result.forEach(element => {
-					visits.push(element);
-				});
+				else{
+					console.log ("the result");
+					response.send(result);
+					
+				}
 			});
-	
-			response.send(visits);
 		}
-	
+		else {
 		//What happens if there are more than one patientid
-		connection.query(`SELECT patientid FROM patient WHERE firstname=${firstname} AND lastname=${lastname}`, function (err, result) {
+		let query="";
+		if(firstname && lastname) {
+			query= properties.findVisitsWithName(firstname, lastname);
+		}
+		else if (firstname) {
+			query= properties.findVisitsWithFirstname(firstname);
+		}
+		else if (lastname) {
+			query= properties.findVisitsWithLastname(lastname);
+		}
+		
+		console.log ("thew query is " + query);
+
+		connection.query(query, function (err, result) {
 			if (err) {
 				console.log(err.message);
+				response.status(404).send(err);
 			}
-			patientid = result[0]["patientid"];
+			else {
+			
+			response.send(result);
+			}
 	
-			let getVisits = "SELECT * FROM visit WHERE patientid=" + patientid;
-			visits = []; //Stores the seperate visits in array format
-	
-			connection.query(getVisits, function (err, result) {
-				result.forEach(element => {
-					visits.push(element);
-				});
-			});
-	
-			response.send(visits);
 		});
+	
+	}
 	  
 	  function sleep(ms) {
 		return new Promise((resolve) => {

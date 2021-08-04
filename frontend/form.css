@@ -1,4 +1,20 @@
-span{
-    display: inline-block;
-    margin-right: 10px;
+#myTable{
+    text-align: left;
+    float: left;
+}
+#CurrentFirstNameTag{
+    
+    white-space: nowrap;
+}
+#CurrentLastNameTag{
+    
+    white-space: nowrap;
+}
+#CurrentVisitIdTag{
+    
+    white-space: nowrap;
+}
+#CurrentPatientIdTag{
+    
+    white-space: nowrap;
 }

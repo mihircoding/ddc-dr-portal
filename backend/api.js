@@ -63,28 +63,16 @@ app.get('/api/activities', (request, response) => {
 app.get('/api/doctorActivities', (request, response) => {
 	//[category, activityname, activitycode]
 	let visitid = null;
-	let patientid = null;
-	let firstname = null;
-	let lastname = null;
-
-	if (request.body.visitid) {
-		visitid = parseInt(request.body.visitid);
-	}
-	if (request.body.patientid) {
-		patientid = parseInt(request.body.patientid);
-	}
-	if (request.body.firstname) {
-		firstname = parseInt(request.body.firstname);
-	}
-	if (request.body.lastname) {
-		lastname = parseInt(request.body.lastname);
+	if (request.query.visitid) {
+		visitid = parseInt(request.query.visitid);
 	}
 
 	async function init() {
 		await sleep(1000);
 		
 		if (visitid != null) {
-			let query = `SELECT * FROM doctoractivity WHERE visitid=${visitid}`;
+			let query = `select d.did, d.doctorid, d.visitid, d.proceduretime, a.name, a.code, a.category, a.type from doctoractivity
+			 d, activities a where d.activityid=a.activityid and d.visitid=${visitid}`;
 			connection.query(query, function(err, result) {
 				if (err) {
 					console.log(err.message);
@@ -92,62 +80,9 @@ app.get('/api/doctorActivities', (request, response) => {
 				response.send(result);
 			});
 		}
-		if (patientid != null) {
-			let visits = [];
-			connection.query(properties.getVisits(patientid), function (err, result) {
-				if (err) {
-					console.log(err.message);
-				}
-				result.forEach(element => {
-					visits.push(element['visitid']);
-				})
-
-				visits.forEach(element => {
-					let query = `SELECT * FROM doctoractivity WHERE visitid=${element}`;
-					connection.query(query, function(err, result) {
-						if (err) {
-							console.log(err.message);
-						}
-						response.send(result);
-					});
-				})
-			});
+		else {
+			response.status(404).send("insufficient data needs visitid");
 		}
-
-		let patients = [];
-		let visits = [];
-
-		connection.query(properties.getPatientID(firstname, lastname), function(err, result) {
-			if (err) {
-				console.log(err.message);
-			}
-			result.forEach(element => {
-				patients.push(element['patientid']);
-			})
-
-			patients.forEach(element => {
-				connection.query(properties.getVisits(element), function(err,result) {
-					if (err) {
-						console.log(err.message);
-					}
-
-					result.forEach(item => {
-						visits.push(item['visitid']);
-					})
-
-					visits.forEach(item => {
-						let query = `SELECT * FROM doctoractivity WHERE visitid=${item}`;
-						connection.query(query, function (err, result) {
-							if (err) {
-								console.log(err.message);
-							}
-							response.send(result);
-						});
-					});
-				});
-			});
-		});
-	  
 	  	function sleep(ms) {
 			return new Promise((resolve) => {
 		  	setTimeout(resolve, ms);

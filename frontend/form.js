@@ -1,7 +1,6 @@
 
     	$(document).ready(function () {
 			console.log("Ready is called");
-		  // EditDataPatient();
 		   
 		});
 
@@ -33,17 +32,65 @@
 		}
 		function CurrentPatientInformation (){
 			var code = `<hr>
-		
-		<div style="text-align: left;">
 			<h4>Current Patient Information</h4>
-			<br>
-			<span>
-				<b>First Name:</b> <span id="insertFirstName"></span><b>Last Name:</b> <span id="insertLastName"></span>
-				<b>Visit ID:</b> <span id="insertVisitID"></span><b>PatientID:</b> <span id="insertPatientID"></span>
-			</span>
-		</div>
-		<hr>`
+			<div id='myTable'>
+				<div class="container pt-4">
+					<div class="table-responsive">
+						<table align="left" id="CurrentPatientInfo" class="table table-bordered">
+							<tbody>
+								<td id="CurrentFirstNameTag" class="text-left">
+									<label for="FirstName">
+										<b>First Name: </b>
+										
+									</label>
+									<input id ="CurrentFirstName"  type="text"/>
+								</td>
+
+								<td id="CurrentLastNameTag" class="text-left">
+									<label for="LastName">
+										<b>Last Name: </b>
+										
+									</label>
+									<input id ="CurrentLastName"  type="text"/>
+								</td>
+
+								<td id="CurrentVisitIdTag" class="text-left">
+									<label for="VisitId">
+										<b>Visit ID: </b>
+										
+									</label>
+									<input id ="CurrentVisitId"  type="text"/>
+									<select id="VisitidDropdown" onchange="ShowKnownProcedures()">
+										<option></option>
+									</select>
+								</td>
+
+								<td id="CurrentPatientIdTag" class="text-left">
+									<label for="PatientId">
+										<b>Patient ID: </b>
+										
+									</label>
+									<input id ="CurrentPatientId"  type="text"/>
+								</td>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			`
 		$(`#PatientInfo`).html(code);
+		$(`#VisitidDropdown`).hide();
+		$(`#CurrentFirstName`).prop('disabled',true);
+		$(`#CurrentLastName`).prop('disabled',true);
+		$(`#CurrentVisitId`).prop('disabled',true);
+		$(`#CurrentPatientId`).prop('disabled',true);
+
+		$(`#CurrentFirstName`).val($(`#FirstName`).val());
+		$(`#CurrentLastName`).val($(`#LastName`).val());
+		$(`#CurrentVisitId`).val($(`#VisitID`).val());
+		$(`#CurrentPatientId`).val($(`#PatientID`).val());
+
+		
 		}
 		function TableInitializer(){
 			var HeaderTableCode = `<div class="container pt-4">
@@ -127,13 +174,22 @@
 				$(`#saveBtn${rowId}`).html('&#x270D');
 				$(`#saveBtn${rowId}`).attr("onclick",`saveData(${rowId})`);
 			}
-			function saveData(rowId){
+			 async function saveData(rowId){
+				var ProcedureName = $(`#R${rowId}1`).text();
+				var TypeProcedure = $(`#R${rowId}2`).text();
+				var date = $(`#R${rowId}3`).text();
 				$(`#R${rowId}2`).empty();
 				$(`#R${rowId}1`).empty();
 				$(`#R${rowId}3`).empty();
 				addDropDownOne(rowId);
-				addDropDownTwo('EGD', 'dropone'+rowId);
-				$(`#R${rowId}3`).html(`<input type = 'date' id = 'datepicker${rowId}' name = 'datepicker'>`);
+				await new Promise(r => setTimeout(r,100));	
+				$(`#dropone${rowId} option`).filter(function(i,e) {
+					return $(e).text().trim() == ProcedureName}).prop('selected',true);
+				addDropDownTwo(ProcedureName, 'dropone'+rowId);
+				$(`#droptwo${rowId}`).val(TypeProcedure);
+				console.log(date);
+				$(`#R${rowId}3`).html(`<input type = 'date' id = 'datepicker${rowId}' name='datepicker'>`);
+				$(`#datepicker${rowId}`).val(date);
 				$(`#saveBtn${rowId}`).html('&#x1f4be');
 				$(`#saveBtn${rowId}`).attr("onclick",`editData(${rowId})`);
 				
@@ -165,7 +221,8 @@
 					select = select + optionString+"</select>";
 					var key="#R"+rowId+"1";
 					$(key).append(select);	
-				});
+				})
+				;
 			}
 
 			function addDropDownTwo(selectedItem, selectedId) {
@@ -258,8 +315,76 @@
 				
 				callAjax(url,method);
 			}
-			
+			function DisplayMultiPatient () {
+				var VisitID = $('#VisitID').val();
+				var PatientID = $('#PatientID').val();
+				var LastName = $('#LastName').val();
+				var FirstName = $('#FirstName').val();
+				$("#CurrentVisitId").remove()
+				$(`#VisitidDropdown`).show();
+				var url = 'http://localhost:3000/api/patients?visitid='+ VisitID + "&patientid=" + PatientID + "&firstname=" + FirstName + "&lastname=" + LastName;
+				callAjax(url,'GET').
+				done(function(data, textStatus, jqXHR) {
+					console.log("console getting get call for patietn infop");
+					var patientinfo = data;
+					$(`#CurrentPatientId`).val(patientinfo[0].patientid);
+					if (patientinfo) {
+						patientinfo.forEach(element => {
+							$(`#VisitidDropdown`).append(`<option value="${element.visitid}">${element.visitid}</option>`);
+							
+						});
+					};
+				});
+			};
+			function SearchPatient() {
+				CurrentPatientInformation();
+				DisplayMultiPatient();
+			}
+			function ShowKnownProcedures () {
+				var CurrentOption = $(`#VisitidDropdown :selected`).val();
+				var url = 'http://localhost:3000/api/doctorActivities?visitid=' + CurrentOption;
+				callAjax(url,'GET').
+				done(function(data,textStatus,jqXHR){
+					
+					var ProcedureList = data;
+					TableInitializer();
+					
+					if (ProcedureList) {
+						ProcedureList.forEach(element => {
+							var rowId=$("#procedureTable tr").length;
+							var saveBtn = addSaveButton(rowId);
+							var delBtn = addDeleteButton(rowId);
+							
+							var trCode=`<tr id='R${rowId}'>
+										<td id='R${rowId}1'></td> 
+										<td id='R${rowId}2'></td> 
+										<td id='R${rowId}3'></td> 
+										<td id='R${rowId}4'>${saveBtn}</td> 
+										<td id='R${rowId}5'>${delBtn}</td> 
+										</tr>
+										<input type="hidden" id="P${rowId}">`;
+							if(rowId === 1) {
+								$("#placeholder").append(trCode);
 
+							}
+							else {
+								$("#placeholder").prepend(trCode);
+							}
+							console.log("this is row id "+ rowId);
+							var currentTime = element.proceduretime;
+							var justDate = currentTime.substring(0,10);
+							
+							$(`#P${rowId}`).val(element.did);
+							$(`#R${rowId}2`).html(element.name);
+							$(`#R${rowId}1`).html(element.category);
+							$(`#R${rowId}3`).html(justDate);
+							$(`#saveBtn${rowId}`).html('&#x270D');
+							$(`#saveBtn${rowId}`).attr("onclick",`saveData(${rowId})`);
+							 
+						});
+					};
+				});
+			}
 			function callAjax(uri, method, formData) {
 				return $.ajax({
 				url: uri,

@@ -1,4 +1,3 @@
-//CREATE A FUNCTION THAT INITALIZES THE ENTIRE DATABASE
 const mysql = require('mysql');
 const fs = require('fs');
 const { response } = require('express');

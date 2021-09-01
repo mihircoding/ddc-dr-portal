@@ -13,7 +13,6 @@ app.use(cors());
 
 app.use(express.json());
 let connection = properties.connectionDb;
-//Cannot send a number in a response.
 
 //GET Procedures
 app.get('/api/procedureDropdowns', (request, response) => {
@@ -94,8 +93,6 @@ app.get('/api/doctorActivities', (request, response) => {
 
 
 
-//response -> [patientid, firstname, lastname, arr(visitid)] <- GET call to patients ? args can be any of the parameters
-//Use promises the same way here.
 app.get('/api/patients', (request, response) => {
 	//Precedence -> visitid, patientid, name
 	let visitid = 0;
@@ -133,7 +130,7 @@ app.get('/api/patients', (request, response) => {
 		else if (patientid != 0) {
 			let getVisits = properties.findVisitsWithPatientId(patientid);
 			console.log("patient id query is"+ getVisits);
-			visits = []; //Stores the seperate visits in array format
+			visits = []; 
 	
 			connection.query(getVisits, function (err, result) {
 				if (err) {
@@ -391,12 +388,12 @@ app.post('/api/doctorActivities', (request, response) => {
 	let code = request.query.code;
 	
 	if (activityid == null) {
-		let query = `SELECT activityid FROM activities WHERE code-=${code}`;
+		let query = `SELECT activityid FROM activities WHERE code=${code}`;
 		connection.query(query, function(err, result) {
 			if (err) {
 				console.log(err.message);
 			}
-			activityid = result; //Not actually the activityid, just an object
+			activityid = result; 
 		});
 
 		if (doctorid == null) {

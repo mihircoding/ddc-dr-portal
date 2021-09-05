@@ -1,14 +1,24 @@
 import pytesseract
 import cv2
 import matplotlib.pyplot as plt
-import re
+from flask import Flask, render_template
 
-img = cv2.imread('./minke/cropped3.png')
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return render_template('form.html')
+
+@app.route('/buttonpress')
+def pressed(img):
+    detection(img)
+
 
 def image_preprocess():
     pass
 
-def detection():
+def detection(img):
     data = {
         'first': "",
         'middle': "",
@@ -33,6 +43,5 @@ def detection():
     
 
 if __name__ == '__main__':
-    #print(words)
-    print(detection())
+    app.run(port=3000, debug=True)
     

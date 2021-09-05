@@ -1,0 +1,18 @@
+#basic {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    border: 5px solid black;
+    padding: 50px;
+    margin: 20px;
+  }
+button{
+    margin-top: 25px;
+    margin-left: 100px;
+}
+input{
+    
+    margin-left: 50px;
+}

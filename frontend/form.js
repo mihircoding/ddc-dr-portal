@@ -1,7 +1,7 @@
 
     	$(document).ready(function () {
 			console.log("Ready is called");
-		   
+			GetParams();
 		});
 
 		function SaveDataPatient(){
@@ -384,6 +384,24 @@
 						});
 					};
 				});
+			}
+			function GetParams() {
+				const queryString = window.location.search;
+				if (!queryString) {
+					return;
+				}
+				const urlParams = new URLSearchParams(queryString);
+				
+					const FirstName = urlParams.get("FirstName");
+					console.log(FirstName);
+					$(`#FirstName`).val(FirstName);
+				
+				
+					const LastName = urlParams.get("LastName");
+					console.log(LastName);
+					$(`#LastName`).val(LastName);
+
+				
 			}
 			function callAjax(uri, method, formData) {
 				return $.ajax({

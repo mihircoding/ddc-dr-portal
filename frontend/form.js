@@ -387,7 +387,7 @@
 			}
 			function GetParams() {
 				const queryString = window.location.search;
-				if (!queryString) {
+				if (queryString.length<5) {
 					return;
 				}
 				const urlParams = new URLSearchParams(queryString);

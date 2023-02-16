@@ -1,0 +1,216 @@
+{
+	"procedures": [{
+			"procedureName": "EGD",
+			"activities": [{
+					"activityName": "Diagnostic",
+					"code": 43235
+				},
+				{
+					"activityName": "Diagnostic with Biopsy",
+					"code": 43239
+				},
+				{
+					"activityName": "Diagnostic with hot bx removal",
+					"code": 43250
+				},
+				{
+					"activityName": "Diagnostic with snare removal",
+					"code": 43251
+				},
+				{
+					"activityName": "Diagnostic with ablation",
+					"code": 43258
+				},
+				{
+					"activityName": "Diagnostic with control of bleeding",
+					"code": 43255
+				},
+				{
+					"activityName": "Diagnostic with FB removal",
+					"code": 43247
+				},
+				{
+					"activityName": "Diagnostic with banding",
+					"code": 43244
+				},
+				{
+					"activityName": "Diagnostic with EMR",
+					"code": 43254
+				}
+			]
+		},
+		{
+			"procedureName": "Flex Sig",
+			"activities": [{
+					"activityName": "Diagnostic",
+					"code": 45330
+				},
+				{
+					"activityName": "Diagnostic with Biopsy",
+					"code": 45331
+				},
+				{
+					"activityName": "Diagnostic with hot bx removal",
+					"code": 45333
+				},
+				{
+					"activityName": "Diagnostic with snare removal",
+					"code": 45338
+				},
+				{
+					"activityName": "Diagnostic with ablation",
+					"code": 45339
+				},
+				{
+					"activityName": "Diagnostic with control of bleeding",
+					"code": 45334
+				}
+			]
+		},
+		{
+			"procedureName": "Colon",
+			"activities": [{
+					"activityName": "Diagnostic",
+					"code": 45378
+				},
+				{
+					"activityName": "Diagnostic with Biopsy",
+					"code": 45380
+				},
+				{
+					"activityName": "Diagnostic with hot bx removal",
+					"code": 45384
+				},
+				{
+					"activityName": "Diagnostic with snare removal",
+					"code": 45385
+				},
+				{
+					"activityName": "Diagnostic with ablation",
+					"code": 45383
+				},
+				{
+					"activityName": "Diagnostic with control of bleeding",
+					"code": 45382
+				}
+			]
+		},
+		{
+			"procedureName": "ERCP",
+			"activities": [{
+					"activityName": "Diagnostic",
+					"code": 43260
+				},
+				{
+					"activityName": "sphincterotomy",
+					"code": 43262
+				},
+				{
+					"activityName": "stone removal",
+					"code": 43264
+				},
+				{
+					"activityName": "stent placement",
+					"code": 43274
+				},
+				{
+					"activityName": "with balloon dilation",
+					"code": 43277
+				},
+				{
+					"activityName": "with stent removal",
+					"code": 43275
+				},
+				{
+					"activityName": "Fluoro for dilation or ERCP",
+					"code": 74360
+				}
+			]
+		},
+		{
+			"procedureName": "Feeding Tubes",
+			"activities": [{
+					"activityName": "EGD with PEG",
+					"code": 43246
+				},
+				{
+					"activityName": "Change of gastrostomy",
+					"code": 43760
+				}
+			]
+		},
+		{
+			"procedureName": "Dilations",
+			"activities": [{
+					"activityName": "EGD with guide wire (Savary)",
+					"code": 43248
+				},
+				{
+					"activityName": "EGD with balloon",
+					"code": 43249
+				},
+				{
+					"activityName": "EGD/Gastric outlet obst.",
+					"code": 43245
+				},
+				{
+					"activityName": "EGD/Dil Achalasia",
+					"code": 43233
+				}
+			]
+		},
+		{
+			"procedureName": "Miscellaneous",
+			"activities": [{
+					"activityName": "Bravo",
+					"code": 91035
+				},
+				{
+					"activityName": "Motility Study",
+					"code": 91010
+				}
+			]
+		}
+	],
+	"consultations": [{
+			"consultationsName": "Consultations",
+			"activities": [{
+					"activityName": "PF/PF/Straight",
+					"code": 99251
+				},
+				{
+					"activityName": "EPF/EPF/Straight",
+					"code": 99252
+				},
+				{
+					"activityName": "Det/Det/Low",
+					"code": 99253
+				},
+				{
+					"activityName": "Comp/Comp/Moderate",
+					"code": 99254
+				},
+				{
+					"activityName": "Comp/Comp/High",
+					"code": 99255
+				}
+			]
+		},
+		{
+			"consultationsName": "Follow up Hospital",
+			"activities": [{
+					"activityName": "PF/PF/Straight or Low",
+					"code": 99231
+				},
+				{
+					"activityName": "EPF/EPF/Moderate",
+					"code": 99232
+				},
+				{
+					"activityName": "Det/Det/High",
+					"code": 99233
+				}
+			]
+		}
+	]
+}

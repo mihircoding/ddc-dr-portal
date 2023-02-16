@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<script src=
+		"https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js">
+		</script>
+		<script src="form.js"></script>
+		
+		<link rel="stylesheet" href="form.css">
+    </head>
+	<body>
+		<div id='info'></div>
+        <div class="container pt-4">
+            <div class="table-responsive">
+            <table id="patientTable" class="table table-bordered">
+                <thead>
+
+                </thead>
+				<tbody>
+					<td id="FirstNameTag" class="text-left">
+						<label for="FirstName">
+							<b>First Name: </b>
+							
+						</label>
+						
+						<input id ="FirstName"  type="text"/>
+						
+					</td>
+					
+					<td id="LastNameTag" class="text-left"><label for="LastName"><b>Last Name: </b></label><input id="LastName" type="text"></td>
+				</tbody>
+            </table>
+            </div>
+        </div>
+		<div id='info'></div>
+        <div class="container pt-4">
+            <div class="table-responsive">
+            <table id="patientTable" class="table table-bordered">
+                <thead>
+
+                </thead>
+				<tbody>
+					<td id="VisitIDTag" class="text-left"><label ><b>Visit ID: </b></label><input id="VisitID" type="number" placeholder="Only numbers"></td>
+					
+					<td id="PatientIDTag" class="text-left"><label ><b>Patient ID: </b></label><input id="PatientID" type="number" placeholder="Only numbers"></td>
+				</tbody>
+            </table>
+            </div>
+        </div>
+		<div style="text-align: center;">
+			<button class="btn btn-md btn-primary" id="saveBtnP" type="button" onclick="SaveDataPatient()">Save</button>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<button class="btn btn-md btn-primary" id="searchBtnP" onclick="SearchPatient()"  type="button">Search</button>
+		</div>
+		<div id="PatientInfo">
+
+		</div>
+		<div id='info'></div>
+		<div id="allPrints">
+			
+		</div>
+	</body>
+
+</html>

@@ -387,7 +387,11 @@
 			}
 			function GetParams() {
 				const queryString = window.location.search;
+<<<<<<< HEAD
 				if (!queryString) {
+=======
+				if (queryString.length<5) {
+>>>>>>> parent of 28a2474 (transfering files over)
 					return;
 				}
 				const urlParams = new URLSearchParams(queryString);
